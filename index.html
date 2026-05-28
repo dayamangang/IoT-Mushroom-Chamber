@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mushroom Chamber Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
@@ -544,15 +546,14 @@
       <div class="footer-card">
         <div class="footer-card-label">🧑‍🔬 Developed By</div>
         <div class="footer-names">
-          <span class="footer-name">Dr. Huidrom Dayananda Singh</span>
+          <span class="footer-name">Dr. H. D. Singh</span>
           <span class="footer-sep">·</span>
-          <span class="footer-name">Dr. Hijam Jiten Singh</span>
+          <span class="footer-name">Dr. P. K. Singh</span>
           <span class="footer-sep">·</span>
-          <span class="footer-name">Dr. Akoijam Ratankumar Singh</span>
+          <span class="footer-name">Dr. S. K. Singh</span>
         </div>
-        <div class="footer-role">ICAR Research Complex for NEH Region</div>
+        <div class="footer-role">Scientists, ICAR Research Complex for NEH Region</div>
         <div class="footer-address">📍 Umiam, Meghalaya – 793 103, India</div>
-        <div class="footer-address">📍 Lamphelpat, Manipur – 795 004, India</div>
       </div>
 
       <div class="footer-card ack-card">
@@ -570,23 +571,22 @@
 </div>
 
 <script>
-  // ── SHEET URL (CORS-safe via allorigins proxy) ────
   const SHEET_ID  = "1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU";
   const SHEET_TAB = "Sheet1";
   const sheetURL  = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_TAB}`;
-  // Proxy fallback in case direct fetch is blocked
   const proxyURL  = `https://api.allorigins.win/get?url=${encodeURIComponent(sheetURL)}`;
 
   let tempChart, humChart, luxChart;
 
-  // ── HELPERS ───────────────────────────────────────
+  // ── GRADIENT HELPER ───────────────────────────────
   function makeGradient(ctx, r, g, b) {
     const grad = ctx.createLinearGradient(0, 0, 0, 260);
-    grad.addColorStop(0,   `rgba(${r},${g},${b},0.3)`);
-    grad.addColorStop(1,   `rgba(${r},${g},${b},0.0)`);
+    grad.addColorStop(0, `rgba(${r},${g},${b},0.3)`);
+    grad.addColorStop(1, `rgba(${r},${g},${b},0.0)`);
     return grad;
   }
 
+  // ── CANVAS HELPER ─────────────────────────────────
   function injectCanvas(wrapperId) {
     const wrap = document.getElementById(wrapperId);
     wrap.innerHTML = '';
@@ -595,7 +595,16 @@
     return canvas;
   }
 
-  // Returns a full Chart.js options object for each chart
+  // ── SHOW ERROR ────────────────────────────────────
+  function showError(msg) {
+    ['tempWrap','humWrap','luxWrap'].forEach(id => {
+      document.getElementById(id).innerHTML =
+        `<div class="loading-state" style="color:#f87171">${msg}</div>`;
+    });
+    document.getElementById("lastUpdated").textContent = "Error loading data";
+  }
+
+  // ── BUILD TIME-AWARE OPTIONS ──────────────────────
   function buildOptions(yLabel) {
     return {
       responsive: true,
@@ -614,20 +623,27 @@
           padding: 12,
           cornerRadius: 10,
           callbacks: {
+            // Show full date + time in tooltip
             title: function(items) {
-              const idx       = items[0].dataIndex;
-              const allLabels = items[0].chart.data.labels;
-              for (let d = 0; d < allLabels.length; d++) {
-                if (idx - d >= 0 && allLabels[idx - d]) return allLabels[idx - d];
-                if (idx + d < allLabels.length && allLabels[idx + d]) return allLabels[idx + d];
-              }
-              return "";
+              const dt = luxon.DateTime.fromMillis(items[0].parsed.x);
+              return dt.toFormat('dd MMM yyyy  HH:mm:ss');
             }
           }
         }
       },
       scales: {
         x: {
+          type: 'time',
+          time: {
+            // Parse ISO strings directly
+            parser: "yyyy-MM-dd'T'HH:mm:ss",
+            // How ticks are displayed on axis
+            displayFormats: {
+              minute: 'HH:mm',
+              hour:   'dd MMM HH:mm'
+            },
+            tooltipFormat: "dd MMM yyyy HH:mm:ss"
+          },
           grid:   { color: 'rgba(36,51,48,0.7)', drawBorder: false },
           border: { display: false },
           ticks: {
@@ -635,15 +651,12 @@
             font:  { family: "'Space Mono', monospace", size: 10 },
             maxRotation: 45,
             minRotation: 30,
-            autoSkip: false,
-            callback: function(value, index) {
-              const label = this.getLabelForValue(index);
-              return label ? label : null;
-            }
+            maxTicksLimit: 12,
+            source: 'auto'
           },
           title: {
             display: true,
-            text:    'Time (HH:MM:SS)',
+            text:    'Date & Time',
             color:   '#6b8f85',
             font:    { family: "'Space Mono', monospace", size: 11 },
             padding: { top: 8 }
@@ -669,29 +682,18 @@
     };
   }
 
-  // ── SHOW ERROR IN WRAPPERS ────────────────────────
-  function showError(msg) {
-    ['tempWrap','humWrap','luxWrap'].forEach(id => {
-      document.getElementById(id).innerHTML =
-        `<div class="loading-state" style="color:#f87171">${msg}</div>`;
-    });
-    document.getElementById("lastUpdated").textContent = "Error loading data";
-  }
-
-  // ── FETCH DATA ────────────────────────────────────
+  // ── FETCH & RENDER ────────────────────────────────
   async function fetchData() {
     let data = null;
 
-    // Try direct first
     try {
       const res = await fetch(sheetURL);
       if (res.ok) data = await res.json();
-    } catch(e) { /* will try proxy */ }
+    } catch(e) { /* try proxy */ }
 
-    // Fallback: allorigins proxy
     if (!data) {
       try {
-        const res = await fetch(proxyURL);
+        const res     = await fetch(proxyURL);
         const wrapper = await res.json();
         data = JSON.parse(wrapper.contents);
       } catch(e) {
@@ -700,14 +702,27 @@
       }
     }
 
-    if (!data || data.length === 0) {
-      showError("⚠ Sheet is empty");
-      return;
-    }
+    if (!data || data.length === 0) { showError("⚠ Sheet is empty"); return; }
 
-    // ── Slice last 12 hours (10-sec intervals → 4320 rows) ──
-    const lastData = data.slice(-4320);
-    const latest   = lastData[lastData.length - 1];
+    // ── Combine Date + Time into ISO datetime, filter last 12 hours ──
+    const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
+
+    const parsed = data.map(r => {
+      const dateStr = (r["Date"]  || "").trim();
+      const timeStr = (r["Time "] || r["Time"] || "").trim();
+      const iso     = `${dateStr}T${timeStr}`;          // e.g. "2026-05-27T09:08:04"
+      const ms      = new Date(iso).getTime();           // real Unix ms
+      return { ms, iso, r };
+    }).filter(d => !isNaN(d.ms));                        // drop malformed rows
+
+    if (parsed.length === 0) { showError("⚠ Could not parse date/time columns"); return; }
+
+    // Latest timestamp, then keep only rows within 12 hours before it
+    const latestMs  = parsed[parsed.length - 1].ms;
+    const cutoffMs  = latestMs - TWELVE_HOURS_MS;
+    const window12h = parsed.filter(d => d.ms >= cutoffMs);
+
+    const latest = window12h[window12h.length - 1].r;
 
     // ── Update metric cards ──
     document.getElementById("insideTemp").innerHTML  = latest.InsideTemperature  + '<span class="card-unit">°C</span>';
@@ -716,25 +731,17 @@
     document.getElementById("outsideHum").innerHTML  = latest.OutsideHumidity    + '<span class="card-unit">%</span>';
     document.getElementById("lux").innerHTML         = latest["Radiation (Lux)"] + '<span class="card-unit">lux</span>';
 
-    // ── Date & Time from sheet (handle "Time " trailing space) ──
-    const sheetDate = (latest["Date"]   || "").trim();
-    const sheetTime = (latest["Time "]  || latest["Time"] || "").trim();
-    document.getElementById("lastUpdated").textContent = sheetDate + " · " + sheetTime;
+    // ── Date & Time display from sheet's latest row ──
+    const sheetDate = (latest["Date"]  || "").trim();
+    const sheetTime = (latest["Time "] || latest["Time"] || "").trim();
+    document.getElementById("lastUpdated").textContent = sheetDate + "  ·  " + sheetTime;
 
-    // ── X-axis labels: show ~12 evenly-spaced time ticks ──
-    const total      = lastData.length;
-    const labelEvery = Math.max(1, Math.floor(total / 12));
-    const labels = lastData.map((r, i) => {
-      if (i % labelEvery === 0) return (r["Time "] || r["Time"] || "").trim();
-      return "";
-    });
-
-    // ── Data series ──
-    const inTemp  = lastData.map(r => Number(r.InsideTemperature));
-    const outTemp = lastData.map(r => Number(r.OutsideTemperature));
-    const inHum   = lastData.map(r => Number(r.InsideHumidity));
-    const outHum  = lastData.map(r => Number(r.OutsideHumidity));
-    const luxData = lastData.map(r => Number(r["Radiation (Lux)"]));
+    // ── Build {x: isoString, y: value} point arrays ──
+    const inTempPts  = window12h.map(d => ({ x: d.iso, y: Number(d.r.InsideTemperature)  }));
+    const outTempPts = window12h.map(d => ({ x: d.iso, y: Number(d.r.OutsideTemperature) }));
+    const inHumPts   = window12h.map(d => ({ x: d.iso, y: Number(d.r.InsideHumidity)     }));
+    const outHumPts  = window12h.map(d => ({ x: d.iso, y: Number(d.r.OutsideHumidity)    }));
+    const luxPts     = window12h.map(d => ({ x: d.iso, y: Number(d.r["Radiation (Lux)"]) }));
 
     // ── Destroy stale charts ──
     if (tempChart) tempChart.destroy();
@@ -746,24 +753,17 @@
     tempChart = new Chart(tempCtx, {
       type: 'line',
       data: {
-        labels,
         datasets: [
           {
-            label: 'Inside Temp (°C)',
-            data: inTemp,
-            borderColor: '#f87171',
-            backgroundColor: makeGradient(tempCtx, 248, 113, 113),
-            borderWidth: 2, tension: 0.4,
-            pointRadius: 0, pointHoverRadius: 5,
+            label: 'Inside Temp (°C)', data: inTempPts,
+            borderColor: '#f87171', backgroundColor: makeGradient(tempCtx, 248, 113, 113),
+            borderWidth: 2, tension: 0.4, pointRadius: 0, pointHoverRadius: 5,
             pointHoverBackgroundColor: '#f87171', fill: true
           },
           {
-            label: 'Outside Temp (°C)',
-            data: outTemp,
-            borderColor: '#60a5fa',
-            backgroundColor: makeGradient(tempCtx, 96, 165, 250),
-            borderWidth: 2, tension: 0.4,
-            pointRadius: 0, pointHoverRadius: 5,
+            label: 'Outside Temp (°C)', data: outTempPts,
+            borderColor: '#60a5fa', backgroundColor: makeGradient(tempCtx, 96, 165, 250),
+            borderWidth: 2, tension: 0.4, pointRadius: 0, pointHoverRadius: 5,
             pointHoverBackgroundColor: '#60a5fa', fill: true
           }
         ]
@@ -776,24 +776,17 @@
     humChart = new Chart(humCtx, {
       type: 'line',
       data: {
-        labels,
         datasets: [
           {
-            label: 'Inside Humidity (%)',
-            data: inHum,
-            borderColor: '#4ade80',
-            backgroundColor: makeGradient(humCtx, 74, 222, 128),
-            borderWidth: 2, tension: 0.4,
-            pointRadius: 0, pointHoverRadius: 5,
+            label: 'Inside Humidity (%)', data: inHumPts,
+            borderColor: '#4ade80', backgroundColor: makeGradient(humCtx, 74, 222, 128),
+            borderWidth: 2, tension: 0.4, pointRadius: 0, pointHoverRadius: 5,
             pointHoverBackgroundColor: '#4ade80', fill: true
           },
           {
-            label: 'Outside Humidity (%)',
-            data: outHum,
-            borderColor: '#fb923c',
-            backgroundColor: makeGradient(humCtx, 251, 146, 60),
-            borderWidth: 2, tension: 0.4,
-            pointRadius: 0, pointHoverRadius: 5,
+            label: 'Outside Humidity (%)', data: outHumPts,
+            borderColor: '#fb923c', backgroundColor: makeGradient(humCtx, 251, 146, 60),
+            borderWidth: 2, tension: 0.4, pointRadius: 0, pointHoverRadius: 5,
             pointHoverBackgroundColor: '#fb923c', fill: true
           }
         ]
@@ -806,15 +799,11 @@
     luxChart = new Chart(luxCtx, {
       type: 'line',
       data: {
-        labels,
         datasets: [
           {
-            label: 'Radiation (Lux)',
-            data: luxData,
-            borderColor: '#f59e0b',
-            backgroundColor: makeGradient(luxCtx, 245, 158, 11),
-            borderWidth: 2, tension: 0.4,
-            pointRadius: 0, pointHoverRadius: 5,
+            label: 'Radiation (Lux)', data: luxPts,
+            borderColor: '#f59e0b', backgroundColor: makeGradient(luxCtx, 245, 158, 11),
+            borderWidth: 2, tension: 0.4, pointRadius: 0, pointHoverRadius: 5,
             pointHoverBackgroundColor: '#f59e0b', fill: true
           }
         ]
