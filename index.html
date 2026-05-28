@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,21 +9,14 @@
 
 <title>MycoSense AI Dashboard</title>
 
-<!-- GOOGLE FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
-<!-- FONT AWESOME -->
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
-<!-- CHART JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
-/* =========================
-   RESET
-========================= */
 
 *{
 margin:0;
@@ -34,13 +27,9 @@ box-sizing:border-box;
 :root{
 
 --bg:#050816;
---bg2:#0f172a;
-
 --card:rgba(17,25,40,0.72);
-
 --border:rgba(255,255,255,0.08);
 
---white:#ffffff;
 --text:#dbeafe;
 --muted:#94a3b8;
 
@@ -49,7 +38,6 @@ box-sizing:border-box;
 --orange:#f59e0b;
 --red:#ef4444;
 --purple:#8b5cf6;
-
 }
 
 body{
@@ -68,10 +56,6 @@ min-height:100vh;
 overflow-x:hidden;
 }
 
-/* =========================
-   APP LAYOUT
-========================= */
-
 .app{
 
 display:flex;
@@ -79,9 +63,7 @@ display:flex;
 min-height:100vh;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* SIDEBAR */
 
 .sidebar{
 
@@ -113,8 +95,8 @@ margin-bottom:45px;
 
 .brand-icon{
 
-width:56px;
-height:56px;
+width:58px;
+height:58px;
 
 border-radius:18px;
 
@@ -191,9 +173,7 @@ rgba(6,182,212,0.18)
 color:white;
 }
 
-/* =========================
-   MAIN
-========================= */
+/* MAIN */
 
 .main{
 
@@ -204,9 +184,7 @@ width:calc(100% - 280px);
 padding:32px;
 }
 
-/* =========================
-   TOPBAR
-========================= */
+/* TOPBAR */
 
 .topbar{
 
@@ -237,9 +215,9 @@ margin-top:12px;
 
 font-size:13px;
 
-color:#94a3b8;
-
 font-family:'JetBrains Mono',monospace;
+
+color:#94a3b8;
 }
 
 .live-status{
@@ -291,9 +269,7 @@ opacity:1;
 }
 }
 
-/* =========================
-   CARDS
-========================= */
+/* KPI CARDS */
 
 .cards{
 
@@ -309,8 +285,6 @@ margin-bottom:30px;
 
 .card{
 
-position:relative;
-
 background:var(--card);
 
 border:1px solid var(--border);
@@ -320,6 +294,8 @@ backdrop-filter:blur(18px);
 border-radius:28px;
 
 padding:26px;
+
+position:relative;
 
 overflow:hidden;
 }
@@ -351,6 +327,10 @@ background:linear-gradient(90deg,#22c55e,#14b8a6);
 
 .orange::before{
 background:linear-gradient(90deg,#f59e0b,#f97316);
+}
+
+.purple::before{
+background:linear-gradient(90deg,#8b5cf6,#ec4899);
 }
 
 .card-top{
@@ -394,6 +374,10 @@ background:rgba(34,197,94,0.15);
 background:rgba(245,158,11,0.15);
 }
 
+.purple .card-icon{
+background:rgba(139,92,246,0.15);
+}
+
 .card-label{
 
 font-size:13px;
@@ -409,7 +393,7 @@ letter-spacing:1px;
 
 .card-value{
 
-font-size:42px;
+font-size:40px;
 
 font-weight:800;
 
@@ -423,9 +407,56 @@ font-size:18px;
 color:#94a3b8;
 }
 
-/* =========================
-   CHARTS
-========================= */
+/* ANALYTICS */
+
+.analytics-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(240px,1fr));
+
+gap:22px;
+
+margin-bottom:30px;
+}
+
+.analytics-card{
+
+background:var(--card);
+
+border:1px solid var(--border);
+
+backdrop-filter:blur(18px);
+
+border-radius:24px;
+
+padding:24px;
+}
+
+.analytics-title{
+
+font-size:13px;
+
+margin-bottom:14px;
+
+color:#94a3b8;
+
+text-transform:uppercase;
+
+letter-spacing:1px;
+}
+
+.analytics-value{
+
+font-size:30px;
+
+font-weight:800;
+
+color:white;
+}
+
+/* CHARTS */
 
 .charts{
 
@@ -482,9 +513,7 @@ position:relative;
 height:320px;
 }
 
-/* =========================
-   FOOTER
-========================= */
+/* FOOTER */
 
 .footer{
 
@@ -495,13 +524,9 @@ text-align:center;
 font-size:13px;
 
 color:#94a3b8;
-
-padding-bottom:20px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* RESPONSIVE */
 
 @media(max-width:1100px){
 
@@ -549,8 +574,6 @@ font-size:34px;
 
 <div class="app">
 
-<!-- SIDEBAR -->
-
 <div class="sidebar">
 
 <div class="brand">
@@ -579,11 +602,6 @@ font-size:34px;
 </a>
 
 <a href="#">
-<i class="fa-solid fa-bell"></i>
-<span>Alerts</span>
-</a>
-
-<a href="#">
 <i class="fa-solid fa-database"></i>
 <span>Logs</span>
 </a>
@@ -597,11 +615,7 @@ font-size:34px;
 
 </div>
 
-<!-- MAIN -->
-
 <div class="main">
-
-<!-- TOPBAR -->
 
 <div class="topbar">
 
@@ -634,11 +648,9 @@ LIVE MONITORING
 <div class="card red">
 
 <div class="card-top">
-
 <div class="card-icon">
 <i class="fa-solid fa-temperature-half"></i>
 </div>
-
 </div>
 
 <div class="card-label">
@@ -655,11 +667,9 @@ Inside Temperature
 <div class="card blue">
 
 <div class="card-top">
-
 <div class="card-icon">
 <i class="fa-solid fa-temperature-quarter"></i>
 </div>
-
 </div>
 
 <div class="card-label">
@@ -676,11 +686,9 @@ Outside Temperature
 <div class="card green">
 
 <div class="card-top">
-
 <div class="card-icon">
 <i class="fa-solid fa-droplet"></i>
 </div>
-
 </div>
 
 <div class="card-label">
@@ -694,14 +702,31 @@ Inside Humidity
 
 </div>
 
+<div class="card purple">
+
+<div class="card-top">
+<div class="card-icon">
+<i class="fa-solid fa-cloud-rain"></i>
+</div>
+</div>
+
+<div class="card-label">
+Outside Humidity
+</div>
+
+<div class="card-value">
+<span id="outsideHum">--</span>
+<span class="unit">%</span>
+</div>
+
+</div>
+
 <div class="card orange">
 
 <div class="card-top">
-
 <div class="card-icon">
 <i class="fa-solid fa-sun"></i>
 </div>
-
 </div>
 
 <div class="card-label">
@@ -717,6 +742,66 @@ Radiation
 
 </div>
 
+<!-- ANALYTICS -->
+
+<div class="analytics-grid">
+
+<div class="analytics-card">
+<div class="analytics-title">
+12 h Average Temperature
+</div>
+<div class="analytics-value">
+<span id="avgTemp">--</span> °C
+</div>
+</div>
+
+<div class="analytics-card">
+<div class="analytics-title">
+12 h Std Dev Temperature
+</div>
+<div class="analytics-value">
+<span id="stdTemp">--</span>
+</div>
+</div>
+
+<div class="analytics-card">
+<div class="analytics-title">
+12 h Average Humidity
+</div>
+<div class="analytics-value">
+<span id="avgHum">--</span> %
+</div>
+</div>
+
+<div class="analytics-card">
+<div class="analytics-title">
+12 h Std Dev Humidity
+</div>
+<div class="analytics-value">
+<span id="stdHum">--</span>
+</div>
+</div>
+
+<div class="analytics-card">
+<div class="analytics-title">
+12 h Average Radiation
+</div>
+<div class="analytics-value">
+<span id="avgLux">--</span> lux
+</div>
+</div>
+
+<div class="analytics-card">
+<div class="analytics-title">
+12 h Std Dev Radiation
+</div>
+<div class="analytics-value">
+<span id="stdLux">--</span>
+</div>
+</div>
+
+</div>
+
 <!-- CHARTS -->
 
 <div class="charts">
@@ -724,15 +809,12 @@ Radiation
 <div class="chart-card large">
 
 <div class="chart-head">
-
 <div class="chart-title">
 Temperature Analytics
 </div>
-
 <div class="chart-sub">
 Inside vs Outside Temperature
 </div>
-
 </div>
 
 <div class="chart-container">
@@ -744,15 +826,12 @@ Inside vs Outside Temperature
 <div class="chart-card">
 
 <div class="chart-head">
-
 <div class="chart-title">
 Humidity Analytics
 </div>
-
 <div class="chart-sub">
-Humidity over time
+Inside vs Outside Humidity
 </div>
-
 </div>
 
 <div class="chart-container">
@@ -764,15 +843,12 @@ Humidity over time
 <div class="chart-card">
 
 <div class="chart-head">
-
 <div class="chart-title">
 Radiation Analytics
 </div>
-
 <div class="chart-sub">
 Lux variation
 </div>
-
 </div>
 
 <div class="chart-container">
@@ -784,9 +860,7 @@ Lux variation
 </div>
 
 <div class="footer">
-
 Developed by Dr. Huidrom Dayananda Singh · ICAR Research Complex for NEH Region
-
 </div>
 
 </div>
@@ -810,9 +884,7 @@ let tempChart;
 let humChart;
 let luxChart;
 
-/* =========================
-   CSV PARSER
-========================= */
+/* CSV PARSER */
 
 function parseCSV(text){
 
@@ -861,13 +933,30 @@ row[h] =
 });
 
 return row;
-
 });
 }
 
-/* =========================
-   CHART OPTIONS
-========================= */
+/* STATISTICS */
+
+function average(arr){
+
+return arr.reduce((a,b)=>a+b,0)/arr.length;
+}
+
+function standardDeviation(arr){
+
+const avg = average(arr);
+
+const squareDiffs =
+arr.map(v => Math.pow(v - avg,2));
+
+const avgSquareDiff =
+average(squareDiffs);
+
+return Math.sqrt(avgSquareDiff);
+}
+
+/* CHART OPTIONS */
 
 function chartOptions(){
 
@@ -887,9 +976,7 @@ plugins:{
 legend:{
 
 labels:{
-
 color:'#cbd5e1',
-
 usePointStyle:true
 }
 }
@@ -910,6 +997,8 @@ color:'rgba(255,255,255,0.05)'
 
 y:{
 
+beginAtZero:true,
+
 ticks:{
 color:'#94a3b8'
 },
@@ -922,9 +1011,7 @@ color:'rgba(255,255,255,0.05)'
 }
 }
 
-/* =========================
-   FETCH LIVE DATA
-========================= */
+/* FETCH LIVE DATA */
 
 async function fetchData(){
 
@@ -966,13 +1053,17 @@ if(data.length === 0) return;
 
 const parsed = data.map(r=>{
 
-const dateStr = (r["Date"] || "").trim();
+const dateStr =
+(r["Date"] || "").trim();
 
-const timeStr = (r["Time"] || "").trim();
+const timeStr =
+(r["Time"] || "").trim();
 
-const iso = `${dateStr}T${timeStr}`;
+const iso =
+`${dateStr}T${timeStr}`;
 
-const ms = new Date(iso).getTime();
+const ms =
+new Date(iso).getTime();
 
 return {ms, iso, r};
 
@@ -1009,17 +1100,21 @@ document.getElementById("insideHum")
 .textContent =
 latest.InsideHumidity;
 
+document.getElementById("outsideHum")
+.textContent =
+latest.OutsideHumidity;
+
 document.getElementById("lux")
 .textContent =
 latest["Radiation (Lux)"];
 
-/* UPDATE DATE TIME */
+/* DATE TIME */
 
 document.getElementById("liveDateTime")
 .textContent =
 `${latest.Date} · ${latest.Time}`;
 
-/* BUILD DATA */
+/* DATA ARRAYS */
 
 const labels =
 window12h.map(d => d.iso);
@@ -1039,12 +1134,43 @@ window12h.map(d =>
 Number(d.r.InsideHumidity)
 );
 
+const outsideHum =
+window12h.map(d =>
+Number(d.r.OutsideHumidity)
+);
+
 const luxData =
 window12h.map(d =>
 Number(d.r["Radiation (Lux)"])
 );
 
-/* DESTROY OLD */
+/* STATISTICS */
+
+document.getElementById("avgTemp")
+.textContent =
+average(insideTemp).toFixed(2);
+
+document.getElementById("stdTemp")
+.textContent =
+standardDeviation(insideTemp).toFixed(2);
+
+document.getElementById("avgHum")
+.textContent =
+average(insideHum).toFixed(2);
+
+document.getElementById("stdHum")
+.textContent =
+standardDeviation(insideHum).toFixed(2);
+
+document.getElementById("avgLux")
+.textContent =
+average(luxData).toFixed(2);
+
+document.getElementById("stdLux")
+.textContent =
+standardDeviation(luxData).toFixed(2);
+
+/* DESTROY OLD CHARTS */
 
 if(tempChart) tempChart.destroy();
 
@@ -1124,13 +1250,31 @@ labels,
 datasets:[
 
 {
-label:'Humidity',
+label:'Inside Humidity',
 
 data:insideHum,
 
 borderColor:'#22c55e',
 
 backgroundColor:'rgba(34,197,94,0.12)',
+
+fill:true,
+
+tension:0.4,
+
+pointRadius:0,
+
+borderWidth:3
+},
+
+{
+label:'Outside Humidity',
+
+data:outsideHum,
+
+borderColor:'#8b5cf6',
+
+backgroundColor:'rgba(139,92,246,0.12)',
 
 fill:true,
 
