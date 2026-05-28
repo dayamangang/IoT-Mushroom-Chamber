@@ -9,11 +9,14 @@
 
 <title>MycoSense AI Dashboard</title>
 
+<!-- GOOGLE FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
+<!-- FONT AWESOME -->
 <link rel="stylesheet"
 href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
+<!-- CHART JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -57,13 +60,13 @@ overflow-x:hidden;
 }
 
 .app{
-
 display:flex;
-
 min-height:100vh;
 }
 
-/* SIDEBAR */
+/* =========================
+   SIDEBAR
+========================= */
 
 .sidebar{
 
@@ -75,13 +78,16 @@ top:0;
 left:0;
 bottom:0;
 
-background:rgba(15,23,42,0.75);
+background:rgba(15,23,42,0.78);
 
 backdrop-filter:blur(18px);
 
 border-right:1px solid var(--border);
 
 padding:30px 22px;
+
+display:flex;
+flex-direction:column;
 }
 
 .brand{
@@ -115,6 +121,7 @@ box-shadow:0 0 25px rgba(34,197,94,0.35);
 
 font-size:22px;
 font-weight:800;
+
 color:white;
 }
 
@@ -134,6 +141,8 @@ font-family:'JetBrains Mono',monospace;
 display:flex;
 flex-direction:column;
 gap:12px;
+
+margin-bottom:auto;
 }
 
 .nav a{
@@ -173,7 +182,79 @@ rgba(6,182,212,0.18)
 color:white;
 }
 
-/* MAIN */
+/* =========================
+   DEVELOPER SECTION
+========================= */
+
+.developer-section{
+
+margin-top:30px;
+}
+
+.developer-title{
+
+font-size:11px;
+
+letter-spacing:1.5px;
+
+text-transform:uppercase;
+
+color:#64748b;
+
+margin-bottom:14px;
+
+font-family:'JetBrains Mono',monospace;
+}
+
+.developer-card{
+
+background:rgba(255,255,255,0.04);
+
+border:1px solid rgba(255,255,255,0.06);
+
+border-radius:16px;
+
+padding:14px;
+
+margin-bottom:12px;
+
+backdrop-filter:blur(10px);
+
+transition:0.3s;
+}
+
+.developer-card:hover{
+
+background:rgba(255,255,255,0.07);
+
+transform:translateY(-2px);
+}
+
+.developer-name{
+
+font-size:13px;
+
+font-weight:700;
+
+color:#e2e8f0;
+
+line-height:1.4;
+}
+
+.developer-role{
+
+margin-top:6px;
+
+font-size:11px;
+
+color:#94a3b8;
+
+line-height:1.5;
+}
+
+/* =========================
+   MAIN
+========================= */
 
 .main{
 
@@ -184,7 +265,9 @@ width:calc(100% - 280px);
 padding:32px;
 }
 
-/* TOPBAR */
+/* =========================
+   TOPBAR
+========================= */
 
 .topbar{
 
@@ -199,6 +282,7 @@ margin-bottom:30px;
 
 font-size:36px;
 font-weight:800;
+
 color:white;
 }
 
@@ -269,7 +353,9 @@ opacity:1;
 }
 }
 
-/* KPI CARDS */
+/* =========================
+   KPI CARDS
+========================= */
 
 .cards{
 
@@ -407,7 +493,9 @@ font-size:18px;
 color:#94a3b8;
 }
 
-/* ANALYTICS */
+/* =========================
+   ANALYTICS
+========================= */
 
 .analytics-grid{
 
@@ -456,7 +544,9 @@ font-weight:800;
 color:white;
 }
 
-/* CHARTS */
+/* =========================
+   CHARTS
+========================= */
 
 .charts{
 
@@ -481,12 +571,10 @@ padding:26px;
 }
 
 .chart-card.large{
-
 grid-column:1/-1;
 }
 
 .chart-head{
-
 margin-bottom:20px;
 }
 
@@ -494,6 +582,7 @@ margin-bottom:20px;
 
 font-size:18px;
 font-weight:700;
+
 color:white;
 }
 
@@ -513,7 +602,9 @@ position:relative;
 height:320px;
 }
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 
 .footer{
 
@@ -526,7 +617,9 @@ font-size:13px;
 color:#94a3b8;
 }
 
-/* RESPONSIVE */
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media(max-width:1100px){
 
@@ -535,7 +628,8 @@ width:90px;
 }
 
 .brand-text,
-.nav a span{
+.nav a span,
+.developer-section{
 display:none;
 }
 
@@ -574,6 +668,8 @@ font-size:34px;
 
 <div class="app">
 
+<!-- SIDEBAR -->
+
 <div class="sidebar">
 
 <div class="brand">
@@ -583,11 +679,18 @@ font-size:34px;
 </div>
 
 <div class="brand-text">
+
 <h1>MycoSense AI</h1>
-<p>SMART CULTIVATION SYSTEM</p>
+
+<p>
+SMART CULTIVATION SYSTEM
+</p>
+
 </div>
 
 </div>
+
+<!-- NAVIGATION -->
 
 <div class="nav">
 
@@ -612,13 +715,56 @@ font-size:34px;
 </a>
 
 </div>
+
+<!-- DEVELOPER SECTION -->
+
+<div class="developer-section">
+
+<div class="developer-title">
+Developed By
 </div>
 
-<div class="footer">
-Developed by Dr. Huidrom Dayananda Singh · ICAR Research Complex for NEH Region
+<div class="developer-card">
+
+<div class="developer-name">
+Dr. Huidrom Dayananda Singh
+</div>
+
+<div class="developer-role">
+Agricultural Engineer & IoT Researcher
 </div>
 
 </div>
+
+<div class="developer-card">
+
+<div class="developer-name">
+Dr. Hijam Jiten Singh
+</div>
+
+<div class="developer-role">
+ICAR Research Complex for NEH Region
+</div>
+
+</div>
+
+<div class="developer-card">
+
+<div class="developer-name">
+Dr. Akoijam Ratankumar Singh
+</div>
+
+<div class="developer-role">
+Smart Agriculture & Automation
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- MAIN -->
 
 <div class="main">
 
@@ -1175,7 +1321,7 @@ document.getElementById("stdLux")
 .textContent =
 standardDeviation(luxData).toFixed(2);
 
-/* DESTROY OLD CHARTS */
+/* DESTROY OLD */
 
 if(tempChart) tempChart.destroy();
 
