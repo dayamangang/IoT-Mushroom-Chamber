@@ -486,7 +486,7 @@
       <div class="chart-header">
         <div>
           <div class="chart-title">Temperature Trend</div>
-          <div class="chart-subtitle">Inside vs Outside · last 72 readings</div>
+          <div class="chart-subtitle">Inside vs Outside · last 12 hours</div>
         </div>
         <div class="legend-dots">
           <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Inside</div>
@@ -590,6 +590,19 @@
         bodyFont: { family: "'Space Mono', monospace", size: 12 },
         padding: 12,
         cornerRadius: 10,
+        callbacks: {
+          title: function(items) {
+            // Find nearest non-empty label around this index
+            const idx = items[0].dataIndex;
+            const allLabels = items[0].chart.data.labels;
+            // Search nearby for a real time value
+            for (let d = 0; d < allLabels.length; d++) {
+              if (allLabels[idx - d] && allLabels[idx - d] !== "") return allLabels[idx - d];
+              if (allLabels[idx + d] && allLabels[idx + d] !== "") return allLabels[idx + d];
+            }
+            return "";
+          }
+        }
       }
     },
     scales: {
@@ -598,8 +611,13 @@
         ticks: {
           color: '#6b8f85',
           font: { family: "'Space Mono', monospace", size: 10 },
-          maxTicksLimit: 12,
-          maxRotation: 0
+          maxRotation: 45,
+          minRotation: 30,
+          callback: function(value, index) {
+            // Only show non-empty labels
+            const label = this.getLabelForValue(index);
+            return label !== "" ? label : null;
+          }
         },
         border: { display: false }
       },
@@ -638,8 +656,8 @@
 
       if (!data || data.length === 0) { console.warn("No data"); return; }
 
-      // Last 72 entries ≈ 12 hours if readings are every 10 min
-      const lastData = data.slice(-72);
+      // Readings every 10 sec → 4320 rows = 12 hours
+      const lastData = data.slice(-4320);
       const latest   = lastData[lastData.length - 1];
 
       // ── Update cards ──
@@ -649,14 +667,20 @@
       document.getElementById("outsideHum").innerHTML  = latest.OutsideHumidity + '<span class="card-unit">%</span>';
       document.getElementById("lux").innerHTML         = latest["Radiation (Lux)"] + '<span class="card-unit">lux</span>';
 
-      // ── Timestamp ──
-      const now = new Date();
-      const dateStr = now.toLocaleDateString([], {day:'2-digit', month:'short', year:'numeric'});
-      const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-      document.getElementById("lastUpdated").textContent = dateStr + " · " + timeStr;
+      // ── Date & Time from sheet (latest row) ──
+      // Note: the Time column has a trailing space → "Time "
+      const sheetDate = latest["Date"]  || "";
+      const sheetTime = latest["Time "] || latest["Time"] || "";
+      document.getElementById("lastUpdated").textContent = sheetDate + " · " + sheetTime;
 
-      // ── Build labels and series ──
-      const labels  = lastData.map((_, i) => i + 1);
+      // ── Build labels from sheet Time column ──
+      // Show only every Nth label so the axis stays readable
+      const totalRows = lastData.length;
+      const labelEvery = Math.max(1, Math.floor(totalRows / 12));
+      const labels = lastData.map((r, i) => {
+        if (i % labelEvery === 0) return r["Time "] || r["Time"] || "";
+        return "";
+      });
       const inTemp  = lastData.map(r => Number(r.InsideTemperature));
       const outTemp = lastData.map(r => Number(r.OutsideTemperature));
       const inHum   = lastData.map(r => Number(r.InsideHumidity));
