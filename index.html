@@ -704,23 +704,26 @@
 
     if (!data || data.length === 0) { showError("⚠ Sheet is empty"); return; }
 
-    // ── Combine Date + Time into ISO datetime, filter last 12 hours ──
-    const TWELVE_HOURS_MS = 12 * 60 * 60 * 1000;
-
+    // ── Parse every row into { ms, iso, r } ──────────
+    // Works for any logging interval — filtering is purely by real timestamp
     const parsed = data.map(r => {
       const dateStr = (r["Date"]  || "").trim();
       const timeStr = (r["Time "] || r["Time"] || "").trim();
-      const iso     = `${dateStr}T${timeStr}`;          // e.g. "2026-05-27T09:08:04"
-      const ms      = new Date(iso).getTime();           // real Unix ms
+      const iso     = `${dateStr}T${timeStr}`;
+      const ms      = new Date(iso).getTime();
       return { ms, iso, r };
-    }).filter(d => !isNaN(d.ms));                        // drop malformed rows
+    }).filter(d => !isNaN(d.ms));
 
     if (parsed.length === 0) { showError("⚠ Could not parse date/time columns"); return; }
 
-    // Latest timestamp, then keep only rows within 12 hours before it
-    const latestMs  = parsed[parsed.length - 1].ms;
-    const cutoffMs  = latestMs - TWELVE_HOURS_MS;
-    const window12h = parsed.filter(d => d.ms >= cutoffMs);
+    // ── Strictly keep only rows within LAST 12 hours ──
+    // latestMs = the newest timestamp in the sheet
+    const latestMs = parsed[parsed.length - 1].ms;
+    const cutoffMs = latestMs - (12 * 60 * 60 * 1000);   // exactly 12 h back
+
+    const window12h = parsed.filter(d => d.ms > cutoffMs && d.ms <= latestMs);
+
+    if (window12h.length === 0) { showError("⚠ No data in last 12 hours"); return; }
 
     const latest = window12h[window12h.length - 1].r;
 
