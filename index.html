@@ -569,92 +569,23 @@
 </div>
 
 <script>
-  const sheetURL = "https://opensheet.elk.sh/1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU/Sheet1";
+  // ── SHEET URL (CORS-safe via allorigins proxy) ────
+  const SHEET_ID  = "1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU";
+  const SHEET_TAB = "Sheet1";
+  const sheetURL  = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_TAB}`;
+  // Proxy fallback in case direct fetch is blocked
+  const proxyURL  = `https://api.allorigins.win/get?url=${encodeURIComponent(sheetURL)}`;
 
   let tempChart, humChart, luxChart;
 
-  // ── SHARED CHART DEFAULTS ──────────────────────────
-  const chartDefaults = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: '#1a2622',
-        borderColor: '#243330',
-        borderWidth: 1,
-        titleColor: '#6b8f85',
-        bodyColor: '#e2f0ec',
-        titleFont: { family: "'Space Mono', monospace", size: 11 },
-        bodyFont: { family: "'Space Mono', monospace", size: 12 },
-        padding: 12,
-        cornerRadius: 10,
-        callbacks: {
-          title: function(items) {
-            // Find nearest non-empty label around this index
-            const idx = items[0].dataIndex;
-            const allLabels = items[0].chart.data.labels;
-            // Search nearby for a real time value
-            for (let d = 0; d < allLabels.length; d++) {
-              if (allLabels[idx - d] && allLabels[idx - d] !== "") return allLabels[idx - d];
-              if (allLabels[idx + d] && allLabels[idx + d] !== "") return allLabels[idx + d];
-            }
-            return "";
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: { color: 'rgba(36,51,48,0.6)', drawBorder: false },
-        ticks: {
-          color: '#6b8f85',
-          font: { family: "'Space Mono', monospace", size: 10 },
-          maxRotation: 45,
-          minRotation: 30,
-          callback: function(value, index) {
-            // Only show non-empty labels
-            const label = this.getLabelForValue(index);
-            return label !== "" ? label : null;
-          }
-        },
-        border: { display: false },
-        title: {
-          display: true,
-          text: 'Time (HH:MM:SS)',
-          color: '#6b8f85',
-          font: { family: "'Space Mono', monospace", size: 11 },
-          padding: { top: 8 }
-        }
-      },
-      y: {
-        beginAtZero: true,
-        grid: { color: 'rgba(36,51,48,0.6)', drawBorder: false },
-        ticks: {
-          color: '#6b8f85',
-          font: { family: "'Space Mono', monospace", size: 10 }
-        },
-        border: { display: false },
-        title: {
-          display: true,
-          text: 'Y_AXIS_LABEL',
-          color: '#6b8f85',
-          font: { family: "'Space Mono', monospace", size: 11 },
-          padding: { bottom: 8 }
-        }
-      }
-    }
-  };
-
-  function makeGradient(ctx, color) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-    gradient.addColorStop(0, color.replace(')', ', 0.25)').replace('rgb', 'rgba'));
-    gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
-    return gradient;
+  // ── HELPERS ───────────────────────────────────────
+  function makeGradient(ctx, r, g, b) {
+    const grad = ctx.createLinearGradient(0, 0, 0, 260);
+    grad.addColorStop(0,   `rgba(${r},${g},${b},0.3)`);
+    grad.addColorStop(1,   `rgba(${r},${g},${b},0.0)`);
+    return grad;
   }
 
-  // ── INJECT CANVAS INTO WRAPPER ────────────────────
   function injectCanvas(wrapperId) {
     const wrap = document.getElementById(wrapperId);
     wrap.innerHTML = '';
@@ -663,151 +594,232 @@
     return canvas;
   }
 
-  // ── CHART OPTIONS WITH CUSTOM Y LABEL ────────────
-  function chartOptions(yLabel) {
-    const opts = JSON.parse(JSON.stringify(chartDefaults));
-    opts.scales.y.title.text = yLabel;
-    return opts;
+  // Returns a full Chart.js options object for each chart
+  function buildOptions(yLabel) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a2622',
+          borderColor: '#243330',
+          borderWidth: 1,
+          titleColor: '#6b8f85',
+          bodyColor: '#e2f0ec',
+          titleFont: { family: "'Space Mono', monospace", size: 11 },
+          bodyFont:  { family: "'Space Mono', monospace", size: 12 },
+          padding: 12,
+          cornerRadius: 10,
+          callbacks: {
+            title: function(items) {
+              const idx       = items[0].dataIndex;
+              const allLabels = items[0].chart.data.labels;
+              for (let d = 0; d < allLabels.length; d++) {
+                if (idx - d >= 0 && allLabels[idx - d]) return allLabels[idx - d];
+                if (idx + d < allLabels.length && allLabels[idx + d]) return allLabels[idx + d];
+              }
+              return "";
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid:   { color: 'rgba(36,51,48,0.7)', drawBorder: false },
+          border: { display: false },
+          ticks: {
+            color: '#6b8f85',
+            font:  { family: "'Space Mono', monospace", size: 10 },
+            maxRotation: 45,
+            minRotation: 30,
+            autoSkip: false,
+            callback: function(value, index) {
+              const label = this.getLabelForValue(index);
+              return label ? label : null;
+            }
+          },
+          title: {
+            display: true,
+            text:    'Time (HH:MM:SS)',
+            color:   '#6b8f85',
+            font:    { family: "'Space Mono', monospace", size: 11 },
+            padding: { top: 8 }
+          }
+        },
+        y: {
+          beginAtZero: true,
+          grid:   { color: 'rgba(36,51,48,0.7)', drawBorder: false },
+          border: { display: false },
+          ticks: {
+            color: '#6b8f85',
+            font:  { family: "'Space Mono', monospace", size: 10 }
+          },
+          title: {
+            display: true,
+            text:    yLabel,
+            color:   '#6b8f85',
+            font:    { family: "'Space Mono', monospace", size: 11 },
+            padding: { bottom: 8 }
+          }
+        }
+      }
+    };
   }
+
+  // ── SHOW ERROR IN WRAPPERS ────────────────────────
+  function showError(msg) {
+    ['tempWrap','humWrap','luxWrap'].forEach(id => {
+      document.getElementById(id).innerHTML =
+        `<div class="loading-state" style="color:#f87171">${msg}</div>`;
+    });
+    document.getElementById("lastUpdated").textContent = "Error loading data";
+  }
+
+  // ── FETCH DATA ────────────────────────────────────
   async function fetchData() {
+    let data = null;
+
+    // Try direct first
     try {
-      const response = await fetch(sheetURL);
-      const data = await response.json();
+      const res = await fetch(sheetURL);
+      if (res.ok) data = await res.json();
+    } catch(e) { /* will try proxy */ }
 
-      if (!data || data.length === 0) { console.warn("No data"); return; }
-
-      // Readings every 10 sec → 4320 rows = 12 hours
-      const lastData = data.slice(-4320);
-      const latest   = lastData[lastData.length - 1];
-
-      // ── Update cards ──
-      document.getElementById("insideTemp").innerHTML  = latest.InsideTemperature + '<span class="card-unit">°C</span>';
-      document.getElementById("outsideTemp").innerHTML = latest.OutsideTemperature + '<span class="card-unit">°C</span>';
-      document.getElementById("insideHum").innerHTML   = latest.InsideHumidity + '<span class="card-unit">%</span>';
-      document.getElementById("outsideHum").innerHTML  = latest.OutsideHumidity + '<span class="card-unit">%</span>';
-      document.getElementById("lux").innerHTML         = latest["Radiation (Lux)"] + '<span class="card-unit">lux</span>';
-
-      // ── Date & Time from sheet (latest row) ──
-      // Note: the Time column has a trailing space → "Time "
-      const sheetDate = latest["Date"]  || "";
-      const sheetTime = latest["Time "] || latest["Time"] || "";
-      document.getElementById("lastUpdated").textContent = sheetDate + " · " + sheetTime;
-
-      // ── Build labels from sheet Time column ──
-      // Show only every Nth label so the axis stays readable
-      const totalRows = lastData.length;
-      const labelEvery = Math.max(1, Math.floor(totalRows / 12));
-      const labels = lastData.map((r, i) => {
-        if (i % labelEvery === 0) return r["Time "] || r["Time"] || "";
-        return "";
-      });
-      const inTemp  = lastData.map(r => Number(r.InsideTemperature));
-      const outTemp = lastData.map(r => Number(r.OutsideTemperature));
-      const inHum   = lastData.map(r => Number(r.InsideHumidity));
-      const outHum  = lastData.map(r => Number(r.OutsideHumidity));
-      const luxData = lastData.map(r => Number(r["Radiation (Lux)"]));
-
-      // ── Destroy old charts ──
-      if (tempChart) tempChart.destroy();
-      if (humChart)  humChart.destroy();
-      if (luxChart)  luxChart.destroy();
-
-      // ── TEMPERATURE CHART ──────────────────────────
-      const tempCanvas = injectCanvas('tempWrap');
-      const tempCtx    = tempCanvas.getContext('2d');
-      tempChart = new Chart(tempCtx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Inside Temp (°C)',
-              data: inTemp,
-              borderColor: '#f87171',
-              backgroundColor: makeGradient(tempCtx, 'rgb(248,113,113)'),
-              borderWidth: 2,
-              tension: 0.4,
-              pointRadius: 0,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: '#f87171',
-              fill: true
-            },
-            {
-              label: 'Outside Temp (°C)',
-              data: outTemp,
-              borderColor: '#60a5fa',
-              backgroundColor: makeGradient(tempCtx, 'rgb(96,165,250)'),
-              borderWidth: 2,
-              tension: 0.4,
-              pointRadius: 0,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: '#60a5fa',
-              fill: true
-            }
-          ]
-        },
-        options: chartOptions('Temperature (°C)')
-      const humCanvas = injectCanvas('humWrap');
-      const humCtx    = humCanvas.getContext('2d');
-      humChart = new Chart(humCtx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Inside Humidity (%)',
-              data: inHum,
-              borderColor: '#4ade80',
-              backgroundColor: makeGradient(humCtx, 'rgb(74,222,128)'),
-              borderWidth: 2,
-              tension: 0.4,
-              pointRadius: 0,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: '#4ade80',
-              fill: true
-            },
-            {
-              label: 'Outside Humidity (%)',
-              data: outHum,
-              borderColor: '#fb923c',
-              backgroundColor: makeGradient(humCtx, 'rgb(251,146,60)'),
-              borderWidth: 2,
-              tension: 0.4,
-              pointRadius: 0,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: '#fb923c',
-              fill: true
-            }
-          ]
-        },
-        options: chartOptions('Humidity (%)')
-      });
-
-      // ── LUX CHART ──────────────────────────────────
-      const luxCanvas = injectCanvas('luxWrap');
-      const luxCtx    = luxCanvas.getContext('2d');
-      luxChart = new Chart(luxCtx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Radiation (Lux)',
-              data: luxData,
-              borderColor: '#f59e0b',
-              backgroundColor: makeGradient(luxCtx, 'rgb(245,158,11)'),
-              borderWidth: 2,
-              tension: 0.4,
-              pointRadius: 0,
-              pointHoverRadius: 5,
-              pointHoverBackgroundColor: '#f59e0b',
-              fill: true
-            }
-          ]
-        },
-        options: chartOptions('Radiation (Lux)')
-      console.error("Fetch error:", err);
+    // Fallback: allorigins proxy
+    if (!data) {
+      try {
+        const res = await fetch(proxyURL);
+        const wrapper = await res.json();
+        data = JSON.parse(wrapper.contents);
+      } catch(e) {
+        showError("⚠ Could not load sheet data");
+        return;
+      }
     }
+
+    if (!data || data.length === 0) {
+      showError("⚠ Sheet is empty");
+      return;
+    }
+
+    // ── Slice last 12 hours (10-sec intervals → 4320 rows) ──
+    const lastData = data.slice(-4320);
+    const latest   = lastData[lastData.length - 1];
+
+    // ── Update metric cards ──
+    document.getElementById("insideTemp").innerHTML  = latest.InsideTemperature  + '<span class="card-unit">°C</span>';
+    document.getElementById("outsideTemp").innerHTML = latest.OutsideTemperature + '<span class="card-unit">°C</span>';
+    document.getElementById("insideHum").innerHTML   = latest.InsideHumidity     + '<span class="card-unit">%</span>';
+    document.getElementById("outsideHum").innerHTML  = latest.OutsideHumidity    + '<span class="card-unit">%</span>';
+    document.getElementById("lux").innerHTML         = latest["Radiation (Lux)"] + '<span class="card-unit">lux</span>';
+
+    // ── Date & Time from sheet (handle "Time " trailing space) ──
+    const sheetDate = (latest["Date"]   || "").trim();
+    const sheetTime = (latest["Time "]  || latest["Time"] || "").trim();
+    document.getElementById("lastUpdated").textContent = sheetDate + " · " + sheetTime;
+
+    // ── X-axis labels: show ~12 evenly-spaced time ticks ──
+    const total      = lastData.length;
+    const labelEvery = Math.max(1, Math.floor(total / 12));
+    const labels = lastData.map((r, i) => {
+      if (i % labelEvery === 0) return (r["Time "] || r["Time"] || "").trim();
+      return "";
+    });
+
+    // ── Data series ──
+    const inTemp  = lastData.map(r => Number(r.InsideTemperature));
+    const outTemp = lastData.map(r => Number(r.OutsideTemperature));
+    const inHum   = lastData.map(r => Number(r.InsideHumidity));
+    const outHum  = lastData.map(r => Number(r.OutsideHumidity));
+    const luxData = lastData.map(r => Number(r["Radiation (Lux)"]));
+
+    // ── Destroy stale charts ──
+    if (tempChart) tempChart.destroy();
+    if (humChart)  humChart.destroy();
+    if (luxChart)  luxChart.destroy();
+
+    // ── TEMPERATURE CHART ──────────────────────────
+    const tempCtx = injectCanvas('tempWrap').getContext('2d');
+    tempChart = new Chart(tempCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Inside Temp (°C)',
+            data: inTemp,
+            borderColor: '#f87171',
+            backgroundColor: makeGradient(tempCtx, 248, 113, 113),
+            borderWidth: 2, tension: 0.4,
+            pointRadius: 0, pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#f87171', fill: true
+          },
+          {
+            label: 'Outside Temp (°C)',
+            data: outTemp,
+            borderColor: '#60a5fa',
+            backgroundColor: makeGradient(tempCtx, 96, 165, 250),
+            borderWidth: 2, tension: 0.4,
+            pointRadius: 0, pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#60a5fa', fill: true
+          }
+        ]
+      },
+      options: buildOptions('Temperature (°C)')
+    });
+
+    // ── HUMIDITY CHART ─────────────────────────────
+    const humCtx = injectCanvas('humWrap').getContext('2d');
+    humChart = new Chart(humCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Inside Humidity (%)',
+            data: inHum,
+            borderColor: '#4ade80',
+            backgroundColor: makeGradient(humCtx, 74, 222, 128),
+            borderWidth: 2, tension: 0.4,
+            pointRadius: 0, pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#4ade80', fill: true
+          },
+          {
+            label: 'Outside Humidity (%)',
+            data: outHum,
+            borderColor: '#fb923c',
+            backgroundColor: makeGradient(humCtx, 251, 146, 60),
+            borderWidth: 2, tension: 0.4,
+            pointRadius: 0, pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#fb923c', fill: true
+          }
+        ]
+      },
+      options: buildOptions('Humidity (%)')
+    });
+
+    // ── LUX CHART ──────────────────────────────────
+    const luxCtx = injectCanvas('luxWrap').getContext('2d');
+    luxChart = new Chart(luxCtx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Radiation (Lux)',
+            data: luxData,
+            borderColor: '#f59e0b',
+            backgroundColor: makeGradient(luxCtx, 245, 158, 11),
+            borderWidth: 2, tension: 0.4,
+            pointRadius: 0, pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#f59e0b', fill: true
+          }
+        ]
+      },
+      options: buildOptions('Radiation (Lux)')
+    });
   }
 
   fetchData();
