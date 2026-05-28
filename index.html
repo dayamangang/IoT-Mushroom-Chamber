@@ -319,7 +319,102 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ── LAST UPDATED ── */
+    /* ── FOOTER SECTION ── */
+    .footer-section { margin-top: 48px; }
+
+    .footer-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin-bottom: 36px;
+    }
+
+    .footer-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .footer-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .footer-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 20px 20px 0 0;
+      background: linear-gradient(90deg, #4ade80, #22d3ee);
+    }
+
+    .ack-card::before {
+      background: linear-gradient(90deg, #a78bfa, #f472b6);
+    }
+
+    .footer-card-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      margin-bottom: 14px;
+    }
+
+    .footer-names {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .footer-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.2px;
+    }
+
+    .footer-sep {
+      color: var(--border);
+      font-size: 16px;
+    }
+
+    .footer-role {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .footer-address {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .footer-ack-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .footer-ack-text strong {
+      color: var(--accent4);
+      font-weight: 700;
+    }
+
+    @media (max-width: 640px) {
+      .footer-cards { grid-template-columns: 1fr; }
+    }
+
+    /* ── FOOTER BAR ── */
     #lastUpdated {
       font-family: 'Space Mono', monospace;
       font-size: 11px;
@@ -438,7 +533,39 @@
 
   </div>
 
-  <footer>🍄 Mushroom IoT Monitoring Dashboard &nbsp;·&nbsp; Auto-refreshes every 60s</footer>
+  <!-- CREATOR & ACKNOWLEDGEMENT FOOTER -->
+  <div class="footer-section">
+
+    <!-- Divider -->
+    <div class="footer-divider"></div>
+
+    <!-- Creator Card -->
+    <div class="footer-cards">
+      <div class="footer-card">
+        <div class="footer-card-label">🧑‍🔬 Developed By</div>
+        <div class="footer-names">
+          <span class="footer-name">Dr. H. D. Singh</span>
+          <span class="footer-sep">·</span>
+          <span class="footer-name">Dr. P. K. Singh</span>
+          <span class="footer-sep">·</span>
+          <span class="footer-name">Dr. S. K. Singh</span>
+        </div>
+        <div class="footer-role">Scientists, ICAR Research Complex for NEH Region</div>
+        <div class="footer-address">📍 Umiam, Meghalaya – 793 103, India</div>
+      </div>
+
+      <div class="footer-card ack-card">
+        <div class="footer-card-label">🙏 Acknowledgement</div>
+        <div class="footer-ack-text">
+          The authors gratefully acknowledge the support and guidance of the
+          <strong>Director, ICAR Research Complex for NEH Region, Umiam</strong>
+          for providing the necessary facilities and encouragement to carry out this work.
+        </div>
+      </div>
+    </div>
+
+    <footer>🍄 Mushroom IoT Monitoring Dashboard &nbsp;·&nbsp; Auto-refreshes every 60s</footer>
+  </div>
 </div>
 
 <script>
@@ -524,8 +651,9 @@
 
       // ── Timestamp ──
       const now = new Date();
-      document.getElementById("lastUpdated").textContent =
-        "Updated " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      const dateStr = now.toLocaleDateString([], {day:'2-digit', month:'short', year:'numeric'});
+      const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+      document.getElementById("lastUpdated").textContent = dateStr + " · " + timeStr;
 
       // ── Build labels and series ──
       const labels  = lastData.map((_, i) => i + 1);
