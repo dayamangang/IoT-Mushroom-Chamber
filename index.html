@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +7,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mushroom Cultivation Chamber Dashboard</title>
+<title>MycoSense AI Dashboard</title>
 
 <!-- GOOGLE FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -69,7 +70,7 @@ min-height:100vh;
 
 .sidebar{
 
-width:280px;
+width:320px;
 
 position:fixed;
 
@@ -83,10 +84,12 @@ backdrop-filter:blur(18px);
 
 border-right:1px solid var(--border);
 
-padding:30px 22px;
+padding:24px 18px;
 
 display:flex;
 flex-direction:column;
+
+overflow-y:auto;
 }
 
 .brand{
@@ -95,7 +98,7 @@ display:flex;
 align-items:center;
 gap:14px;
 
-margin-bottom:45px;
+margin-bottom:40px;
 }
 
 .brand-icon{
@@ -133,7 +136,13 @@ margin-top:4px;
 color:#94a3b8;
 
 font-family:'JetBrains Mono',monospace;
+
+line-height:1.5;
 }
+
+/* =========================
+   NAVIGATION
+========================= */
 
 .nav{
 
@@ -141,7 +150,7 @@ display:flex;
 flex-direction:column;
 gap:12px;
 
-margin-bottom:auto;
+margin-bottom:25px;
 }
 
 .nav a{
@@ -187,7 +196,9 @@ color:white;
 
 .developer-section{
 
-margin-top:30px;
+margin-top:10px;
+
+padding-bottom:20px;
 }
 
 .developer-title{
@@ -220,6 +231,10 @@ margin-bottom:12px;
 backdrop-filter:blur(10px);
 
 transition:0.3s;
+
+word-wrap:break-word;
+
+overflow-wrap:break-word;
 }
 
 .developer-card:hover{
@@ -237,18 +252,20 @@ font-weight:700;
 
 color:#e2e8f0;
 
-line-height:1.4;
+line-height:1.5;
 }
 
 .developer-role{
 
 margin-top:6px;
 
-font-size:11px;
+font-size:10px;
 
 color:#94a3b8;
 
-line-height:1.5;
+line-height:1.65;
+
+word-break:break-word;
 }
 
 /* =========================
@@ -257,9 +274,9 @@ line-height:1.5;
 
 .main{
 
-margin-left:280px;
+margin-left:320px;
 
-width:calc(100% - 280px);
+width:calc(100% - 320px);
 
 padding:32px;
 }
@@ -290,6 +307,8 @@ color:white;
 margin-top:8px;
 
 color:#94a3b8;
+
+line-height:1.6;
 }
 
 .live-time{
@@ -614,6 +633,8 @@ text-align:center;
 font-size:13px;
 
 color:#94a3b8;
+
+line-height:1.8;
 }
 
 /* =========================
@@ -624,10 +645,10 @@ color:#94a3b8;
 
 .sidebar{
 width:90px;
+overflow:hidden;
 }
 
 .brand-text,
-.nav a span,
 .developer-section{
 display:none;
 }
@@ -657,6 +678,10 @@ gap:20px;
 .card-value{
 font-size:34px;
 }
+
+.live-status{
+font-size:12px;
+}
 }
 
 </style>
@@ -671,6 +696,8 @@ font-size:34px;
 
 <div class="sidebar">
 
+<!-- BRAND -->
+
 <div class="brand">
 
 <div class="brand-icon">
@@ -682,7 +709,8 @@ font-size:34px;
 <h1>MycoSense AI</h1>
 
 <p>
-SMART CULTIVATION SYSTEM
+SMART CULTIVATION<br>
+SYSTEM
 </p>
 
 </div>
@@ -696,21 +724,6 @@ SMART CULTIVATION SYSTEM
 <a href="#" class="active">
 <i class="fa-solid fa-chart-line"></i>
 <span>Dashboard</span>
-</a>
-
-<a href="#">
-<i class="fa-solid fa-chart-pie"></i>
-<span>Analytics</span>
-</a>
-
-<a href="#">
-<i class="fa-solid fa-database"></i>
-<span>Logs</span>
-</a>
-
-<a href="#">
-<i class="fa-solid fa-gear"></i>
-<span>Settings</span>
 </a>
 
 </div>
@@ -766,6 +779,8 @@ Senior Scientist (Plant Pathology), ICAR Research Complex for NEH Region Manipur
 <!-- MAIN -->
 
 <div class="main">
+
+<!-- TOPBAR -->
 
 <div class="topbar">
 
@@ -959,12 +974,15 @@ Radiation
 <div class="chart-card large">
 
 <div class="chart-head">
+
 <div class="chart-title">
 Temperature Analytics
 </div>
+
 <div class="chart-sub">
 Inside vs Outside Temperature
 </div>
+
 </div>
 
 <div class="chart-container">
@@ -976,12 +994,15 @@ Inside vs Outside Temperature
 <div class="chart-card">
 
 <div class="chart-head">
+
 <div class="chart-title">
 Humidity Analytics
 </div>
+
 <div class="chart-sub">
 Inside vs Outside Humidity
 </div>
+
 </div>
 
 <div class="chart-container">
@@ -993,12 +1014,15 @@ Inside vs Outside Humidity
 <div class="chart-card">
 
 <div class="chart-head">
+
 <div class="chart-title">
 Radiation Analytics
 </div>
+
 <div class="chart-sub">
 Lux variation
 </div>
+
 </div>
 
 <div class="chart-container">
@@ -1009,8 +1033,12 @@ Lux variation
 
 </div>
 
+<!-- FOOTER -->
+
 <div class="footer">
+
 Director, ICAR Research Complex for NEH Region, Umiam for providing the necessary facilities and encouragement to carry out this work.
+
 </div>
 
 </div>
@@ -1034,7 +1062,9 @@ let tempChart;
 let humChart;
 let luxChart;
 
-/* CSV PARSER */
+/* =========================
+   CSV PARSER
+========================= */
 
 function parseCSV(text){
 
@@ -1086,7 +1116,9 @@ return row;
 });
 }
 
-/* STATISTICS */
+/* =========================
+   STATISTICS
+========================= */
 
 function average(arr){
 
@@ -1106,7 +1138,9 @@ average(squareDiffs);
 return Math.sqrt(avgSquareDiff);
 }
 
-/* CHART OPTIONS */
+/* =========================
+   CHART OPTIONS
+========================= */
 
 function chartOptions(){
 
@@ -1161,7 +1195,9 @@ color:'rgba(255,255,255,0.05)'
 }
 }
 
-/* FETCH LIVE DATA */
+/* =========================
+   FETCH LIVE DATA
+========================= */
 
 async function fetchData(){
 
@@ -1236,7 +1272,9 @@ d.ms <= latestMs
 const latest =
 window12h[window12h.length - 1].r;
 
-/* UPDATE CARDS */
+/* =========================
+   UPDATE CARDS
+========================= */
 
 document.getElementById("insideTemp")
 .textContent =
@@ -1258,13 +1296,17 @@ document.getElementById("lux")
 .textContent =
 latest["Radiation (Lux)"];
 
-/* DATE TIME */
+/* =========================
+   UPDATE TIME
+========================= */
 
 document.getElementById("liveDateTime")
 .textContent =
-`${latest.Date} · ${latest.Time}`;
+`${latest.Date} • ${latest.Time}`;
 
-/* DATA ARRAYS */
+/* =========================
+   DATA ARRAYS
+========================= */
 
 const labels =
 window12h.map(d => d.iso);
@@ -1294,7 +1336,9 @@ window12h.map(d =>
 Number(d.r["Radiation (Lux)"])
 );
 
-/* STATISTICS */
+/* =========================
+   STATISTICS
+========================= */
 
 document.getElementById("avgTemp")
 .textContent =
@@ -1320,7 +1364,9 @@ document.getElementById("stdLux")
 .textContent =
 standardDeviation(luxData).toFixed(2);
 
-/* DESTROY OLD */
+/* =========================
+   DESTROY OLD CHARTS
+========================= */
 
 if(tempChart) tempChart.destroy();
 
@@ -1328,7 +1374,9 @@ if(humChart) humChart.destroy();
 
 if(luxChart) luxChart.destroy();
 
-/* TEMPERATURE */
+/* =========================
+   TEMPERATURE CHART
+========================= */
 
 tempChart = new Chart(
 document.getElementById('tempChart'),
@@ -1385,7 +1433,9 @@ options:chartOptions()
 }
 );
 
-/* HUMIDITY */
+/* =========================
+   HUMIDITY CHART
+========================= */
 
 humChart = new Chart(
 document.getElementById('humChart'),
@@ -1442,7 +1492,9 @@ options:chartOptions()
 }
 );
 
-/* RADIATION */
+/* =========================
+   RADIATION CHART
+========================= */
 
 luxChart = new Chart(
 document.getElementById('luxChart'),
@@ -1475,11 +1527,15 @@ options:chartOptions()
 
 }
 
-/* INITIAL LOAD */
+/* =========================
+   INITIAL LOAD
+========================= */
 
 fetchData();
 
-/* AUTO REFRESH */
+/* =========================
+   AUTO REFRESH
+========================= */
 
 setInterval(fetchData,60000);
 
