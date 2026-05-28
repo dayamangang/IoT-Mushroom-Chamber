@@ -1,10 +1,14 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>Mushroom Chamber Dashboard</title>
 
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -153,13 +157,19 @@
   // GOOGLE SHEET URL
   // =====================================================
 
-  // REPLACE WITH YOUR GOOGLE SHEET ID
-
   const sheetURL =
   "https://opensheet.elk.sh/1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU/Sheet1";
 
   // =====================================================
-  // FETCH GOOGLE SHEET DATA
+  // CHART VARIABLES
+  // =====================================================
+
+  let tempChart = null;
+  let humChart = null;
+  let luxChart = null;
+
+  // =====================================================
+  // FETCH DATA
   // =====================================================
 
   async function fetchData()
@@ -172,17 +182,30 @@
 
       console.log(data);
 
+      // =================================================
+      // CHECK DATA
+      // =================================================
+
+      if(data.length === 0)
+      {
+        console.log("No data found");
+        return;
+      }
+
+      // =================================================
       // LAST 12 HOURS
-      // 72 points if data logged every 10 min
+      // =================================================
 
       const lastData = data.slice(-72);
 
+      // =================================================
       // LATEST RECORD
+      // =================================================
 
       const latest = lastData[lastData.length - 1];
 
       // =================================================
-      // DISPLAY LATEST VALUES
+      // DISPLAY NUMERICAL VALUES
       // =================================================
 
       document.getElementById("insideTemp").innerHTML =
@@ -201,53 +224,53 @@
       latest["Radiation (Lux)"] + " lux";
 
       // =================================================
-      // GRAPH DATA
+      // PREPARE GRAPH DATA
       // =================================================
 
       const labels = lastData.map(row => row.Time);
 
       const inTemp = lastData.map(row =>
-        parseFloat(row.InsideTemperature));
+        Number(row.InsideTemperature));
 
       const outTemp = lastData.map(row =>
-        parseFloat(row.OutsideTemperature));
+        Number(row.OutsideTemperature));
 
       const inHum = lastData.map(row =>
-        parseFloat(row.InsideHumidity));
+        Number(row.InsideHumidity));
 
       const outHum = lastData.map(row =>
-        parseFloat(row.OutsideHumidity));
+        Number(row.OutsideHumidity));
 
       const lux = lastData.map(row =>
-        parseFloat(row["Radiation (Lux)"]));
+        Number(row["Radiation (Lux)"]));
 
       // =================================================
-      // DESTROY OLD CHARTS BEFORE REDRAW
+      // DESTROY OLD CHARTS
       // =================================================
 
-      if(window.tempChartInstance)
+      if(tempChart)
       {
-        window.tempChartInstance.destroy();
+        tempChart.destroy();
       }
 
-      if(window.humChartInstance)
+      if(humChart)
       {
-        window.humChartInstance.destroy();
+        humChart.destroy();
       }
 
-      if(window.luxChartInstance)
+      if(luxChart)
       {
-        window.luxChartInstance.destroy();
+        luxChart.destroy();
       }
 
       // =================================================
       // TEMPERATURE CHART
       // =================================================
 
-      window.tempChartInstance = new Chart(
-        document.getElementById('tempChart'),
+      tempChart = new Chart(
+        document.getElementById("tempChart"),
         {
-          type: 'line',
+          type: "line",
 
           data:
           {
@@ -256,9 +279,13 @@
             datasets:
             [
               {
-                label: 'Inside Temperature',
+                label: "Inside Temperature",
 
                 data: inTemp,
+
+                borderColor: "red",
+
+                backgroundColor: "transparent",
 
                 borderWidth: 2,
 
@@ -266,9 +293,13 @@
               },
 
               {
-                label: 'Outside Temperature',
+                label: "Outside Temperature",
 
                 data: outTemp,
+
+                borderColor: "blue",
+
+                backgroundColor: "transparent",
 
                 borderWidth: 2,
 
@@ -290,10 +321,10 @@
       // HUMIDITY CHART
       // =================================================
 
-      window.humChartInstance = new Chart(
-        document.getElementById('humChart'),
+      humChart = new Chart(
+        document.getElementById("humChart"),
         {
-          type: 'line',
+          type: "line",
 
           data:
           {
@@ -302,9 +333,13 @@
             datasets:
             [
               {
-                label: 'Inside Humidity',
+                label: "Inside Humidity",
 
                 data: inHum,
+
+                borderColor: "green",
+
+                backgroundColor: "transparent",
 
                 borderWidth: 2,
 
@@ -312,9 +347,13 @@
               },
 
               {
-                label: 'Outside Humidity',
+                label: "Outside Humidity",
 
                 data: outHum,
+
+                borderColor: "orange",
+
+                backgroundColor: "transparent",
 
                 borderWidth: 2,
 
@@ -336,10 +375,10 @@
       // LUX CHART
       // =================================================
 
-      window.luxChartInstance = new Chart(
-        document.getElementById('luxChart'),
+      luxChart = new Chart(
+        document.getElementById("luxChart"),
         {
-          type: 'line',
+          type: "line",
 
           data:
           {
@@ -348,9 +387,13 @@
             datasets:
             [
               {
-                label: 'Radiation (Lux)',
+                label: "Radiation (Lux)",
 
                 data: lux,
+
+                borderColor: "purple",
+
+                backgroundColor: "transparent",
 
                 borderWidth: 2,
 
@@ -372,7 +415,7 @@
 
     catch(error)
     {
-      console.error("Error fetching Google Sheet data:", error);
+      console.error("Error fetching data:", error);
     }
   }
 
@@ -392,3 +435,4 @@
 
 </body>
 </html>
+```
