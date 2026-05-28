@@ -619,7 +619,14 @@
             return label !== "" ? label : null;
           }
         },
-        border: { display: false }
+        border: { display: false },
+        title: {
+          display: true,
+          text: 'Time (HH:MM:SS)',
+          color: '#6b8f85',
+          font: { family: "'Space Mono', monospace", size: 11 },
+          padding: { top: 8 }
+        }
       },
       y: {
         beginAtZero: true,
@@ -628,7 +635,14 @@
           color: '#6b8f85',
           font: { family: "'Space Mono', monospace", size: 10 }
         },
-        border: { display: false }
+        border: { display: false },
+        title: {
+          display: true,
+          text: 'Y_AXIS_LABEL',
+          color: '#6b8f85',
+          font: { family: "'Space Mono', monospace", size: 11 },
+          padding: { bottom: 8 }
+        }
       }
     }
   };
@@ -649,7 +663,12 @@
     return canvas;
   }
 
-  // ── FETCH AND RENDER ──────────────────────────────
+  // ── CHART OPTIONS WITH CUSTOM Y LABEL ────────────
+  function chartOptions(yLabel) {
+    const opts = JSON.parse(JSON.stringify(chartDefaults));
+    opts.scales.y.title.text = yLabel;
+    return opts;
+  }
   async function fetchData() {
     try {
       const response = await fetch(sheetURL);
@@ -727,10 +746,7 @@
             }
           ]
         },
-        options: { ...chartDefaults }
-      });
-
-      // ── HUMIDITY CHART ─────────────────────────────
+        options: chartOptions('Temperature (°C)')
       const humCanvas = injectCanvas('humWrap');
       const humCtx    = humCanvas.getContext('2d');
       humChart = new Chart(humCtx, {
@@ -764,7 +780,7 @@
             }
           ]
         },
-        options: { ...chartDefaults }
+        options: chartOptions('Humidity (%)')
       });
 
       // ── LUX CHART ──────────────────────────────────
@@ -789,10 +805,7 @@
             }
           ]
         },
-        options: { ...chartDefaults }
-      });
-
-    } catch (err) {
+        options: chartOptions('Radiation (Lux)')
       console.error("Fetch error:", err);
     }
   }
