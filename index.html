@@ -572,11 +572,32 @@
 
 <script>
   const SHEET_ID  = "1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU";
-  const SHEET_TAB = "Sheet1";
-  const sheetURL  = `https://opensheet.elk.sh/${SHEET_ID}/${SHEET_TAB}`;
-  const proxyURL  = `https://api.allorigins.win/get?url=${encodeURIComponent(sheetURL)}`;
+  const SHEET_GID = "0"; // Sheet1 default GID
+
+  // Google Sheets CSV export — NO row limit, returns entire sheet
+  const csvURL   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+  const proxyURL = `https://api.allorigins.win/get?url=${encodeURIComponent(csvURL)}`;
 
   let tempChart, humChart, luxChart;
+
+  // ── CSV PARSER (handles quoted fields) ───────────
+  function parseCSV(text) {
+    const lines = text.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    return lines.slice(1).map(line => {
+      const cols = [];
+      let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        if      (line[i] === '"')              { inQ = !inQ; }
+        else if (line[i] === ',' && !inQ)      { cols.push(cur.trim()); cur = ''; }
+        else                                   { cur += line[i]; }
+      }
+      cols.push(cur.trim());
+      const row = {};
+      headers.forEach((h, i) => { row[h] = (cols[i] || '').replace(/^"|"$/g, '').trim(); });
+      return row;
+    });
+  }
 
   // ── GRADIENT HELPER ───────────────────────────────
   function makeGradient(ctx, r, g, b) {
@@ -684,31 +705,36 @@
 
   // ── FETCH & RENDER ────────────────────────────────
   async function fetchData() {
-    let data = null;
+    let rawCSV = null;
 
+    // Try direct CSV export first
     try {
-      const res = await fetch(sheetURL);
-      if (res.ok) data = await res.json();
+      const res = await fetch(csvURL);
+      if (res.ok) rawCSV = await res.text();
     } catch(e) { /* try proxy */ }
 
-    if (!data) {
+    // Fallback via allorigins proxy (handles CORS on GitHub Pages)
+    if (!rawCSV) {
       try {
         const res     = await fetch(proxyURL);
         const wrapper = await res.json();
-        data = JSON.parse(wrapper.contents);
+        rawCSV = wrapper.contents;
       } catch(e) {
         showError("⚠ Could not load sheet data");
         return;
       }
     }
 
-    if (!data || data.length === 0) { showError("⚠ Sheet is empty"); return; }
+    if (!rawCSV || rawCSV.trim() === '') { showError("⚠ Sheet returned empty data"); return; }
 
-    // ── Parse every row into { ms, iso, r } ──────────
-    // Works for any logging interval — filtering is purely by real timestamp
+    const data = parseCSV(rawCSV);
+    if (data.length === 0) { showError("⚠ No rows found in sheet"); return; }
+
+    // ── Parse ALL rows into real timestamps ──────────
+    // Works for any logging interval — purely time-based, no row-count assumption
     const parsed = data.map(r => {
-      const dateStr = (r["Date"]  || "").trim();
-      const timeStr = (r["Time "] || r["Time"] || "").trim();
+      const dateStr = (r["Date"] || "").trim();
+      const timeStr = (r["Time"] || "").trim();   // CSV strips trailing spaces from headers
       const iso     = `${dateStr}T${timeStr}`;
       const ms      = new Date(iso).getTime();
       return { ms, iso, r };
@@ -735,8 +761,8 @@
     document.getElementById("lux").innerHTML         = latest["Radiation (Lux)"] + '<span class="card-unit">lux</span>';
 
     // ── Date & Time display from sheet's latest row ──
-    const sheetDate = (latest["Date"]  || "").trim();
-    const sheetTime = (latest["Time "] || latest["Time"] || "").trim();
+    const sheetDate = (latest["Date"] || "").trim();
+    const sheetTime = (latest["Time"] || "").trim();
     document.getElementById("lastUpdated").textContent = sheetDate + "  ·  " + sheetTime;
 
     // ── Build {x: isoString, y: value} point arrays ──
