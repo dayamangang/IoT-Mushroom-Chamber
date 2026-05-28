@@ -1,508 +1,651 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mushroom Chamber Dashboard</title>
-
-  <!-- CHART JS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body{
-      font-family: Arial, sans-serif;
-      background:#f3f4f6;
-      margin:0;
-      padding:20px;
+    :root {
+      --bg:          #0b0f0e;
+      --surface:     #121a18;
+      --surface2:    #1a2622;
+      --border:      #243330;
+      --accent:      #4ade80;
+      --accent2:     #22d3ee;
+      --accent3:     #fb923c;
+      --accent4:     #a78bfa;
+      --accent5:     #f472b6;
+      --text:        #e2f0ec;
+      --muted:       #6b8f85;
+      --glow:        rgba(74, 222, 128, 0.18);
     }
 
-    h1{
-      text-align:center;
-      margin-bottom:10px;
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
     }
 
-    .subtitle{
-      text-align:center;
-      color:#666;
-      margin-bottom:30px;
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .card-container{
-      display:grid;
-      grid-template-columns:
-      repeat(auto-fit,minmax(220px,1fr));
-
-      gap:20px;
-
-      margin-bottom:30px;
+    /* ── AMBIENT GLOW ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse, rgba(74,222,128,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .card{
-      background:white;
-
-      border-radius:15px;
-
-      padding:20px;
-
-      box-shadow:0 4px 10px rgba(0,0,0,0.1);
-
-      text-align:center;
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
     }
 
-    .card h2{
-      font-size:18px;
-
-      color:#555;
-
-      margin-bottom:10px;
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 48px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .value{
-      font-size:36px;
+    .header-left { display: flex; align-items: center; gap: 18px; }
 
-      font-weight:bold;
+    .logo-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, #4ade80, #22d3ee);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 24px rgba(74,222,128,0.35);
+      flex-shrink: 0;
     }
 
-    .chart-box{
-      background:white;
-
-      border-radius:15px;
-
-      padding:20px;
-
-      margin-bottom:30px;
-
-      box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    .header-text h1 {
+      font-size: clamp(18px, 3vw, 26px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      line-height: 1.15;
     }
 
-    canvas{
-      width:100% !important;
-
-      height:400px !important;
+    .header-text p {
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      margin-top: 3px;
     }
 
-    .footer{
-      text-align:center;
-
-      color:#666;
-
-      margin-top:30px;
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-family: 'Space Mono', monospace;
+      color: var(--accent);
+      white-space: nowrap;
     }
 
+    .pulse {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent);
+      animation: pulse-anim 2s infinite;
+    }
+
+    @keyframes pulse-anim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* ── METRIC CARDS ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .metric-card.c1::before { background: linear-gradient(90deg, #f87171, #fb923c); }
+    .metric-card.c2::before { background: linear-gradient(90deg, #60a5fa, #818cf8); }
+    .metric-card.c3::before { background: linear-gradient(90deg, #4ade80, #22d3ee); }
+    .metric-card.c4::before { background: linear-gradient(90deg, #34d399, #2dd4bf); }
+    .metric-card.c5::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    .metric-card:nth-child(1) { animation-delay: 0.05s; }
+    .metric-card:nth-child(2) { animation-delay: 0.10s; }
+    .metric-card:nth-child(3) { animation-delay: 0.15s; }
+    .metric-card:nth-child(4) { animation-delay: 0.20s; }
+    .metric-card:nth-child(5) { animation-delay: 0.25s; }
+
+    .card-icon {
+      font-size: 22px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .card-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      margin-bottom: 6px;
+    }
+
+    .card-value {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .card-unit {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-left: 2px;
+    }
+
+    /* ── CHART SECTIONS ── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .chart-card.wide {
+      grid-column: 1 / -1;
+    }
+
+    .chart-card:nth-child(1) { animation-delay: 0.3s; }
+    .chart-card:nth-child(2) { animation-delay: 0.35s; }
+    .chart-card:nth-child(3) { animation-delay: 0.4s; }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: var(--text);
+    }
+
+    .chart-subtitle {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      margin-top: 2px;
+    }
+
+    .legend-dots {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+
+    /* THE FIX: wrapper div controls the height */
+    .chart-wrapper {
+      position: relative;
+      height: 260px;
+    }
+
+    .chart-wrapper canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding-top: 40px;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── ERROR / LOADING STATES ── */
+    .loading-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 260px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      gap: 10px;
+    }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── LAST UPDATED ── */
+    #lastUpdated {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 640px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .chart-card.wide { grid-column: auto; }
+      .card-value { font-size: 30px; }
+    }
   </style>
-
 </head>
-
 <body>
+<div class="page-wrap">
 
-  <h1>Mushroom Cultivation Chamber Dashboard</h1>
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="logo-icon">🍄</div>
+      <div class="header-text">
+        <h1>Mushroom Cultivation Chamber</h1>
+        <p>LIVE ENVIRONMENTAL MONITORING · LAST 12 HRS</p>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <div class="status-pill">
+        <span class="pulse"></span>
+        LIVE
+      </div>
+      <span id="lastUpdated">Fetching data…</span>
+    </div>
+  </header>
 
-  <div class="subtitle">
-    Live Environmental Monitoring System
+  <!-- METRIC CARDS -->
+  <div class="cards-grid">
+    <div class="metric-card c1">
+      <span class="card-icon">🌡️</span>
+      <div class="card-label">Inside Temp</div>
+      <div class="card-value" id="insideTemp">--<span class="card-unit">°C</span></div>
+    </div>
+    <div class="metric-card c2">
+      <span class="card-icon">🌡️</span>
+      <div class="card-label">Outside Temp</div>
+      <div class="card-value" id="outsideTemp">--<span class="card-unit">°C</span></div>
+    </div>
+    <div class="metric-card c3">
+      <span class="card-icon">💧</span>
+      <div class="card-label">Inside Humidity</div>
+      <div class="card-value" id="insideHum">--<span class="card-unit">%</span></div>
+    </div>
+    <div class="metric-card c4">
+      <span class="card-icon">💧</span>
+      <div class="card-label">Outside Humidity</div>
+      <div class="card-value" id="outsideHum">--<span class="card-unit">%</span></div>
+    </div>
+    <div class="metric-card c5">
+      <span class="card-icon">☀️</span>
+      <div class="card-label">Radiation</div>
+      <div class="card-value" id="lux">--<span class="card-unit">lux</span></div>
+    </div>
   </div>
 
-  <!-- =============================================== -->
-  <!-- NUMERICAL DISPLAY -->
-  <!-- =============================================== -->
+  <!-- CHARTS -->
+  <div class="charts-grid">
 
-  <div class="card-container">
-
-    <div class="card">
-      <h2>Inside Temperature</h2>
-
-      <div class="value"
-           id="insideTemp">
-           -- °C
+    <!-- Temperature -->
+    <div class="chart-card wide">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Temperature Trend</div>
+          <div class="chart-subtitle">Inside vs Outside · last 72 readings</div>
+        </div>
+        <div class="legend-dots">
+          <div class="legend-item"><div class="legend-dot" style="background:#f87171"></div>Inside</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div>Outside</div>
+        </div>
+      </div>
+      <div class="chart-wrapper" id="tempWrap">
+        <div class="loading-state"><div class="spinner"></div>Loading…</div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Outside Temperature</h2>
-
-      <div class="value"
-           id="outsideTemp">
-           -- °C
+    <!-- Humidity -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Humidity Trend</div>
+          <div class="chart-subtitle">Inside vs Outside</div>
+        </div>
+        <div class="legend-dots">
+          <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Inside</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#fb923c"></div>Outside</div>
+        </div>
+      </div>
+      <div class="chart-wrapper" id="humWrap">
+        <div class="loading-state"><div class="spinner"></div>Loading…</div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>Inside Humidity</h2>
-
-      <div class="value"
-           id="insideHum">
-           -- %
+    <!-- Lux -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Radiation Trend</div>
+          <div class="chart-subtitle">Lux over time</div>
+        </div>
+        <div class="legend-dots">
+          <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Lux</div>
+        </div>
       </div>
-    </div>
-
-    <div class="card">
-      <h2>Outside Humidity</h2>
-
-      <div class="value"
-           id="outsideHum">
-           -- %
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Radiation</h2>
-
-      <div class="value"
-           id="lux">
-           -- lux
+      <div class="chart-wrapper" id="luxWrap">
+        <div class="loading-state"><div class="spinner"></div>Loading…</div>
       </div>
     </div>
 
   </div>
 
-  <!-- =============================================== -->
-  <!-- TEMPERATURE GRAPH -->
-  <!-- =============================================== -->
-
-  <div class="chart-box">
-
-    <h2>
-      Temperature Trend
-    </h2>
-
-    <canvas id="tempChart"></canvas>
-
-  </div>
-
-  <!-- =============================================== -->
-  <!-- HUMIDITY GRAPH -->
-  <!-- =============================================== -->
-
-  <div class="chart-box">
-
-    <h2>
-      Humidity Trend
-    </h2>
-
-    <canvas id="humChart"></canvas>
-
-  </div>
-
-  <!-- =============================================== -->
-  <!-- LUX GRAPH -->
-  <!-- =============================================== -->
-
-  <div class="chart-box">
-
-    <h2>
-      Radiation Trend
-    </h2>
-
-    <canvas id="luxChart"></canvas>
-
-  </div>
-
-  <div class="footer">
-    Mushroom IoT Monitoring Dashboard
-  </div>
+  <footer>🍄 Mushroom IoT Monitoring Dashboard &nbsp;·&nbsp; Auto-refreshes every 60s</footer>
+</div>
 
 <script>
+  const sheetURL = "https://opensheet.elk.sh/1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU/Sheet1";
 
-  // ==================================================
-  // GOOGLE SHEET URL
-  // ==================================================
+  let tempChart, humChart, luxChart;
 
-  const sheetURL =
-  "https://opensheet.elk.sh/1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU/Sheet1";
+  // ── SHARED CHART DEFAULTS ──────────────────────────
+  const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a2622',
+        borderColor: '#243330',
+        borderWidth: 1,
+        titleColor: '#6b8f85',
+        bodyColor: '#e2f0ec',
+        titleFont: { family: "'Space Mono', monospace", size: 11 },
+        bodyFont: { family: "'Space Mono', monospace", size: 12 },
+        padding: 12,
+        cornerRadius: 10,
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(36,51,48,0.6)', drawBorder: false },
+        ticks: {
+          color: '#6b8f85',
+          font: { family: "'Space Mono', monospace", size: 10 },
+          maxTicksLimit: 12,
+          maxRotation: 0
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: { color: 'rgba(36,51,48,0.6)', drawBorder: false },
+        ticks: {
+          color: '#6b8f85',
+          font: { family: "'Space Mono', monospace", size: 10 }
+        },
+        border: { display: false }
+      }
+    }
+  };
 
-  // ==================================================
-  // CHART VARIABLES
-  // ==================================================
+  function makeGradient(ctx, color) {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+    gradient.addColorStop(0, color.replace(')', ', 0.25)').replace('rgb', 'rgba'));
+    gradient.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
+    return gradient;
+  }
 
-  let tempChart;
-  let humChart;
-  let luxChart;
+  // ── INJECT CANVAS INTO WRAPPER ────────────────────
+  function injectCanvas(wrapperId) {
+    const wrap = document.getElementById(wrapperId);
+    wrap.innerHTML = '';
+    const canvas = document.createElement('canvas');
+    wrap.appendChild(canvas);
+    return canvas;
+  }
 
-  // ==================================================
-  // FETCH DATA
-  // ==================================================
-
-  async function fetchData()
-  {
-    try
-    {
+  // ── FETCH AND RENDER ──────────────────────────────
+  async function fetchData() {
+    try {
       const response = await fetch(sheetURL);
-
       const data = await response.json();
 
-      console.log(data);
+      if (!data || data.length === 0) { console.warn("No data"); return; }
 
-      // ================================================
-      // CHECK DATA
-      // ================================================
-
-      if(data.length === 0)
-      {
-        console.log("No data");
-
-        return;
-      }
-
-      // ================================================
-      // LAST DATA
-      // ================================================
-
+      // Last 72 entries ≈ 12 hours if readings are every 10 min
       const lastData = data.slice(-72);
+      const latest   = lastData[lastData.length - 1];
 
-      const latest = lastData[lastData.length - 1];
+      // ── Update cards ──
+      document.getElementById("insideTemp").innerHTML  = latest.InsideTemperature + '<span class="card-unit">°C</span>';
+      document.getElementById("outsideTemp").innerHTML = latest.OutsideTemperature + '<span class="card-unit">°C</span>';
+      document.getElementById("insideHum").innerHTML   = latest.InsideHumidity + '<span class="card-unit">%</span>';
+      document.getElementById("outsideHum").innerHTML  = latest.OutsideHumidity + '<span class="card-unit">%</span>';
+      document.getElementById("lux").innerHTML         = latest["Radiation (Lux)"] + '<span class="card-unit">lux</span>';
 
-      // ================================================
-      // DISPLAY VALUES
-      // ================================================
+      // ── Timestamp ──
+      const now = new Date();
+      document.getElementById("lastUpdated").textContent =
+        "Updated " + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
-      document.getElementById("insideTemp")
-      .innerHTML =
-      latest.InsideTemperature + " °C";
+      // ── Build labels and series ──
+      const labels  = lastData.map((_, i) => i + 1);
+      const inTemp  = lastData.map(r => Number(r.InsideTemperature));
+      const outTemp = lastData.map(r => Number(r.OutsideTemperature));
+      const inHum   = lastData.map(r => Number(r.InsideHumidity));
+      const outHum  = lastData.map(r => Number(r.OutsideHumidity));
+      const luxData = lastData.map(r => Number(r["Radiation (Lux)"]));
 
-      document.getElementById("outsideTemp")
-      .innerHTML =
-      latest.OutsideTemperature + " °C";
+      // ── Destroy old charts ──
+      if (tempChart) tempChart.destroy();
+      if (humChart)  humChart.destroy();
+      if (luxChart)  luxChart.destroy();
 
-      document.getElementById("insideHum")
-      .innerHTML =
-      latest.InsideHumidity + " %";
-
-      document.getElementById("outsideHum")
-      .innerHTML =
-      latest.OutsideHumidity + " %";
-
-      document.getElementById("lux")
-      .innerHTML =
-      latest["Radiation (Lux)"] + " lux";
-
-      // ================================================
-      // GRAPH DATA
-      // ================================================
-
-      const labels =
-      lastData.map((row,index)=>index+1);
-
-      const inTemp =
-      lastData.map(row =>
-      Number(row.InsideTemperature));
-
-      const outTemp =
-      lastData.map(row =>
-      Number(row.OutsideTemperature));
-
-      const inHum =
-      lastData.map(row =>
-      Number(row.InsideHumidity));
-
-      const outHum =
-      lastData.map(row =>
-      Number(row.OutsideHumidity));
-
-      const lux =
-      lastData.map(row =>
-      Number(row["Radiation (Lux)"]));
-
-      // ================================================
-      // DESTROY OLD CHARTS
-      // ================================================
-
-      if(tempChart)
-      {
-        tempChart.destroy();
-      }
-
-      if(humChart)
-      {
-        humChart.destroy();
-      }
-
-      if(luxChart)
-      {
-        luxChart.destroy();
-      }
-
-      // ================================================
-      // TEMPERATURE CHART
-      // ================================================
-
-      const tempCtx =
-      document.getElementById("tempChart")
-      .getContext("2d");
-
-      tempChart = new Chart(tempCtx,
-      {
-        type:"line",
-
-        data:
-        {
-          labels:labels,
-
-          datasets:
-          [
+      // ── TEMPERATURE CHART ──────────────────────────
+      const tempCanvas = injectCanvas('tempWrap');
+      const tempCtx    = tempCanvas.getContext('2d');
+      tempChart = new Chart(tempCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
             {
-              label:"Inside Temperature",
-
-              data:inTemp,
-
-              borderColor:"red",
-
-              backgroundColor:"transparent",
-
-              borderWidth:2,
-
-              tension:0.3
+              label: 'Inside Temp (°C)',
+              data: inTemp,
+              borderColor: '#f87171',
+              backgroundColor: makeGradient(tempCtx, 'rgb(248,113,113)'),
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#f87171',
+              fill: true
             },
-
             {
-              label:"Outside Temperature",
-
-              data:outTemp,
-
-              borderColor:"blue",
-
-              backgroundColor:"transparent",
-
-              borderWidth:2,
-
-              tension:0.3
+              label: 'Outside Temp (°C)',
+              data: outTemp,
+              borderColor: '#60a5fa',
+              backgroundColor: makeGradient(tempCtx, 'rgb(96,165,250)'),
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#60a5fa',
+              fill: true
             }
           ]
         },
-
-        options:
-        {
-          responsive:true,
-
-          maintainAspectRatio:false
-        }
+        options: { ...chartDefaults }
       });
 
-      // ================================================
-      // HUMIDITY CHART
-      // ================================================
-
-      const humCtx =
-      document.getElementById("humChart")
-      .getContext("2d");
-
-      humChart = new Chart(humCtx,
-      {
-        type:"line",
-
-        data:
-        {
-          labels:labels,
-
-          datasets:
-          [
+      // ── HUMIDITY CHART ─────────────────────────────
+      const humCanvas = injectCanvas('humWrap');
+      const humCtx    = humCanvas.getContext('2d');
+      humChart = new Chart(humCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
             {
-              label:"Inside Humidity",
-
-              data:inHum,
-
-              borderColor:"green",
-
-              backgroundColor:"transparent",
-
-              borderWidth:2,
-
-              tension:0.3
+              label: 'Inside Humidity (%)',
+              data: inHum,
+              borderColor: '#4ade80',
+              backgroundColor: makeGradient(humCtx, 'rgb(74,222,128)'),
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#4ade80',
+              fill: true
             },
-
             {
-              label:"Outside Humidity",
-
-              data:outHum,
-
-              borderColor:"orange",
-
-              backgroundColor:"transparent",
-
-              borderWidth:2,
-
-              tension:0.3
+              label: 'Outside Humidity (%)',
+              data: outHum,
+              borderColor: '#fb923c',
+              backgroundColor: makeGradient(humCtx, 'rgb(251,146,60)'),
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#fb923c',
+              fill: true
             }
           ]
         },
-
-        options:
-        {
-          responsive:true,
-
-          maintainAspectRatio:false
-        }
+        options: { ...chartDefaults }
       });
 
-      // ================================================
-      // LUX CHART
-      // ================================================
-
-      const luxCtx =
-      document.getElementById("luxChart")
-      .getContext("2d");
-
-      luxChart = new Chart(luxCtx,
-      {
-        type:"line",
-
-        data:
-        {
-          labels:labels,
-
-          datasets:
-          [
+      // ── LUX CHART ──────────────────────────────────
+      const luxCanvas = injectCanvas('luxWrap');
+      const luxCtx    = luxCanvas.getContext('2d');
+      luxChart = new Chart(luxCtx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
             {
-              label:"Radiation (Lux)",
-
-              data:lux,
-
-              borderColor:"purple",
-
-              backgroundColor:"transparent",
-
-              borderWidth:2,
-
-              tension:0.3
+              label: 'Radiation (Lux)',
+              data: luxData,
+              borderColor: '#f59e0b',
+              backgroundColor: makeGradient(luxCtx, 'rgb(245,158,11)'),
+              borderWidth: 2,
+              tension: 0.4,
+              pointRadius: 0,
+              pointHoverRadius: 5,
+              pointHoverBackgroundColor: '#f59e0b',
+              fill: true
             }
           ]
         },
-
-        options:
-        {
-          responsive:true,
-
-          maintainAspectRatio:false
-        }
+        options: { ...chartDefaults }
       });
 
-    }
-
-    catch(error)
-    {
-      console.log(error);
+    } catch (err) {
+      console.error("Fetch error:", err);
     }
   }
 
-  // ==================================================
-  // INITIAL LOAD
-  // ==================================================
-
   fetchData();
-
-  // ==================================================
-  // AUTO REFRESH
-  // ==================================================
-
-  setInterval(fetchData,60000);
-
+  setInterval(fetchData, 60000);
 </script>
-
 </body>
 </html>
-```
