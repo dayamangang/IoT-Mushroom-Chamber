@@ -1,1545 +1,1053 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MycoSense AI — Smart Cultivation System</title>
 
-<title>Dashboard</title>
-
-<!-- GOOGLE FONTS -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
-<!-- FONT AWESOME -->
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
-
-<!-- CHART JS -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+*{margin:0;padding:0;box-sizing:border-box;}
 
 :root{
+  --bg:#03080f;
+  --surface:#080f1a;
+  --card:#0c1525;
+  --card2:#0e1929;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.10);
 
---bg:#050816;
---card:rgba(17,25,40,0.72);
---border:rgba(255,255,255,0.08);
+  --text:#e8f4fd;
+  --muted:#5a7a9a;
+  --subtle:#3a5570;
 
---text:#dbeafe;
---muted:#94a3b8;
+  --green:#00e5a0;
+  --green-dim:rgba(0,229,160,0.12);
+  --cyan:#00c9ff;
+  --cyan-dim:rgba(0,201,255,0.10);
+  --amber:#ffb700;
+  --amber-dim:rgba(255,183,0,0.12);
+  --red:#ff4d6a;
+  --red-dim:rgba(255,77,106,0.12);
+  --violet:#9f7aea;
+  --violet-dim:rgba(159,122,234,0.12);
 
---green:#22c55e;
---cyan:#06b6d4;
---orange:#f59e0b;
---red:#ef4444;
---purple:#8b5cf6;
+  --sidebar:260px;
+  --radius:20px;
+  --radius-sm:12px;
 }
 
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:99px;}
+
+/* ─── BODY ─── */
 body{
-
-font-family:'Inter',sans-serif;
-
-background:
-radial-gradient(circle at top left,#0f172a 0%,transparent 30%),
-radial-gradient(circle at bottom right,#052e2b 0%,transparent 30%),
-linear-gradient(135deg,#020617,#0f172a);
-
-color:var(--text);
-
-min-height:100vh;
-
-overflow-x:hidden;
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
 }
 
-.app{
-display:flex;
-min-height:100vh;
+/* animated mesh bg */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 5%, rgba(0,229,160,0.055) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 90%, rgba(0,201,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(159,122,234,0.03) 0%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
 }
 
-/* =========================
+/* grid lines overlay */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ─── APP SHELL ─── */
+.app{display:flex;min-height:100vh;position:relative;z-index:1;}
+
+/* ════════════════════════════
    SIDEBAR
-========================= */
-
+════════════════════════════ */
 .sidebar{
-
-width:320px;
-
-position:fixed;
-
-top:0;
-left:0;
-bottom:0;
-
-background:rgba(15,23,42,0.78);
-
-backdrop-filter:blur(18px);
-
-border-right:1px solid var(--border);
-
-padding:24px 18px;
-
-display:flex;
-flex-direction:column;
-
-overflow-y:auto;
+  width:var(--sidebar);
+  position:fixed;top:0;left:0;bottom:0;
+  background:rgba(8,15,26,0.92);
+  backdrop-filter:blur(24px);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:0;
+  overflow:hidden;
+  z-index:100;
+  transition:width .35s cubic-bezier(.4,0,.2,1);
 }
 
+/* brand */
 .brand{
-
-display:flex;
-align-items:center;
-gap:14px;
-
-margin-bottom:40px;
+  display:flex;align-items:center;gap:14px;
+  padding:28px 22px 24px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
 
 .brand-icon{
-
-width:58px;
-height:58px;
-
-border-radius:18px;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-background:linear-gradient(135deg,#22c55e,#06b6d4);
-
-font-size:24px;
-
-box-shadow:0 0 25px rgba(34,197,94,0.35);
+  width:48px;height:48px;border-radius:14px;
+  background:linear-gradient(135deg,var(--green),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+  box-shadow:0 0 30px rgba(0,229,160,0.3);
+  position:relative;
+}
+.brand-icon::after{
+  content:'';position:absolute;inset:-1px;border-radius:15px;
+  background:linear-gradient(135deg,rgba(0,229,160,0.5),rgba(0,201,255,0.5));
+  z-index:-1;filter:blur(8px);
 }
 
 .brand-text h1{
-
-font-size:22px;
-font-weight:800;
-
-color:white;
+  font-family:'Syne',sans-serif;
+  font-size:17px;font-weight:800;
+  color:white;letter-spacing:-.3px;
+  white-space:nowrap;
 }
-
 .brand-text p{
-
-font-size:12px;
-
-margin-top:4px;
-
-color:#94a3b8;
-
-font-family:'JetBrains Mono',monospace;
-
-line-height:1.5;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--muted);
+  letter-spacing:1.5px;line-height:1.6;
+  text-transform:uppercase;
+  white-space:nowrap;
+  margin-top:3px;
 }
 
-/* =========================
-   NAVIGATION
-========================= */
-
-.nav{
-
-display:flex;
-flex-direction:column;
-gap:12px;
-
-margin-bottom:25px;
+/* nav */
+.nav-section{padding:20px 14px 10px;}
+.nav-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--subtle);
+  padding:0 8px;margin-bottom:8px;
 }
-
+.nav{display:flex;flex-direction:column;gap:3px;}
 .nav a{
-
-display:flex;
-align-items:center;
-gap:14px;
-
-padding:15px 18px;
-
-border-radius:16px;
-
-text-decoration:none;
-
-color:#94a3b8;
-
-transition:0.3s;
+  display:flex;align-items:center;gap:13px;
+  padding:11px 14px;border-radius:var(--radius-sm);
+  text-decoration:none;color:var(--muted);
+  font-size:14px;font-weight:500;
+  transition:.2s;white-space:nowrap;
+  position:relative;overflow:hidden;
 }
-
-.nav a:hover{
-
-background:rgba(255,255,255,0.05);
-
-color:white;
-
-transform:translateX(5px);
+.nav a .icon{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;flex-shrink:0;
+  background:rgba(255,255,255,0.04);
+  transition:.2s;
 }
-
+.nav a:hover{color:var(--text);background:rgba(255,255,255,0.04);}
+.nav a:hover .icon{background:rgba(255,255,255,0.07);}
 .nav a.active{
-
-background:linear-gradient(
-135deg,
-rgba(34,197,94,0.18),
-rgba(6,182,212,0.18)
-);
-
-color:white;
+  color:white;
+  background:linear-gradient(135deg,rgba(0,229,160,0.14),rgba(0,201,255,0.08));
+  border:1px solid rgba(0,229,160,0.15);
+}
+.nav a.active .icon{
+  background:linear-gradient(135deg,rgba(0,229,160,0.25),rgba(0,201,255,0.15));
+  color:var(--green);
+}
+.nav a.active::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;
+  width:3px;border-radius:0 3px 3px 0;
+  background:linear-gradient(to bottom,var(--green),var(--cyan));
 }
 
-/* =========================
-   DEVELOPER SECTION
-========================= */
-
-.developer-section{
-
-margin-top:10px;
-
-padding-bottom:20px;
+/* status pill */
+.sidebar-status{
+  margin:auto 14px 0;
+  padding:0 0 20px;
 }
-
-.developer-title{
-
-font-size:11px;
-
-letter-spacing:1.5px;
-
-text-transform:uppercase;
-
-color:#64748b;
-
-margin-bottom:14px;
-
-font-family:'JetBrains Mono',monospace;
+.status-pill{
+  display:flex;align-items:center;gap:10px;
+  padding:13px 14px;border-radius:var(--radius-sm);
+  background:rgba(0,229,160,0.07);
+  border:1px solid rgba(0,229,160,0.12);
 }
-
-.developer-card{
-
-background:rgba(255,255,255,0.04);
-
-border:1px solid rgba(255,255,255,0.06);
-
-border-radius:16px;
-
-padding:14px;
-
-margin-bottom:12px;
-
-backdrop-filter:blur(10px);
-
-transition:0.3s;
-
-word-wrap:break-word;
-
-overflow-wrap:break-word;
+.pulse-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--green);flex-shrink:0;
+  box-shadow:0 0 8px var(--green);
+  animation:pulse 2s infinite;
 }
-
-.developer-card:hover{
-
-background:rgba(255,255,255,0.07);
-
-transform:translateY(-2px);
-}
-
-.developer-name{
-
-font-size:13px;
-
-font-weight:700;
-
-color:#e2e8f0;
-
-line-height:1.5;
-}
-
-.developer-role{
-
-margin-top:6px;
-
-font-size:10px;
-
-color:#94a3b8;
-
-line-height:1.65;
-
-word-break:break-word;
-}
-
-/* =========================
-   MAIN
-========================= */
-
-.main{
-
-margin-left:320px;
-
-width:calc(100% - 320px);
-
-padding:32px;
-}
-
-/* =========================
-   TOPBAR
-========================= */
-
-.topbar{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-margin-bottom:30px;
-}
-
-.topbar h2{
-
-font-size:36px;
-font-weight:800;
-
-color:white;
-}
-
-.topbar p{
-
-margin-top:8px;
-
-color:#94a3b8;
-
-line-height:1.6;
-}
-
-.live-time{
-
-margin-top:12px;
-
-font-size:13px;
-
-font-family:'JetBrains Mono',monospace;
-
-color:#94a3b8;
-}
-
-.live-status{
-
-display:flex;
-align-items:center;
-gap:10px;
-
-padding:12px 18px;
-
-border-radius:50px;
-
-background:rgba(34,197,94,0.15);
-
-border:1px solid rgba(34,197,94,0.2);
-
-color:#22c55e;
-
-font-family:'JetBrains Mono',monospace;
-}
-
-.pulse{
-
-width:10px;
-height:10px;
-
-border-radius:50%;
-
-background:#22c55e;
-
-animation:pulse 1.5s infinite;
-}
-
 @keyframes pulse{
+  0%,100%{transform:scale(1);opacity:1;}
+  50%{transform:scale(1.5);opacity:.5;}
+}
+.status-text{flex:1;}
+.status-text .s1{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--green);
+  letter-spacing:1.5px;text-transform:uppercase;
+}
+.status-text .s2{font-size:11px;color:var(--muted);margin-top:2px;}
 
-0%{
-transform:scale(1);
-opacity:1;
+/* developers */
+.dev-section{
+  padding:16px 14px;border-top:1px solid var(--border);
+}
+.dev-label{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--subtle);margin-bottom:10px;
+}
+.dev-card{
+  padding:11px 13px;border-radius:var(--radius-sm);
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  margin-bottom:7px;
+  transition:.2s;
+}
+.dev-card:hover{background:rgba(255,255,255,0.05);}
+.dev-card:last-child{margin-bottom:0;}
+.dev-name{
+  font-size:12px;font-weight:600;color:#d0e8f5;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.dev-role{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+/* ════════════════════════════
+   MAIN
+════════════════════════════ */
+.main{
+  margin-left:var(--sidebar);
+  width:calc(100% - var(--sidebar));
+  padding:0;
+  display:flex;flex-direction:column;
+  min-height:100vh;
 }
 
-50%{
-transform:scale(1.8);
-opacity:0.4;
+/* ─── TOPBAR ─── */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  padding:18px 32px;
+  background:rgba(3,8,15,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;
+}
+.topbar-left h2{
+  font-family:'Syne',sans-serif;
+  font-size:22px;font-weight:800;
+  color:white;letter-spacing:-.5px;
+}
+.topbar-left p{font-size:13px;color:var(--muted);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+
+.time-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;border-radius:99px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border2);
+}
+.time-chip i{font-size:12px;color:var(--muted);}
+.time-chip span{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--text);
 }
 
-100%{
-transform:scale(1);
-opacity:1;
+.live-badge{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:99px;
+  background:rgba(0,229,160,0.1);
+  border:1px solid rgba(0,229,160,0.2);
 }
+.live-badge .dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:pulse 2s infinite;
+}
+.live-badge span{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:600;
+  color:var(--green);letter-spacing:1px;
 }
 
-/* =========================
+/* mobile menu toggle */
+.menu-btn{
+  display:none;
+  width:38px;height:38px;border-radius:10px;
+  background:rgba(255,255,255,0.06);border:1px solid var(--border2);
+  color:var(--text);font-size:16px;
+  cursor:pointer;align-items:center;justify-content:center;
+  transition:.2s;
+}
+.menu-btn:hover{background:rgba(255,255,255,0.1);}
+
+/* ─── CONTENT ─── */
+.content{padding:28px 32px;flex:1;}
+
+/* ─── SECTION HEADER ─── */
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:700;
+  color:white;letter-spacing:.5px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title::before{
+  content:'';width:4px;height:16px;border-radius:2px;
+  background:linear-gradient(to bottom,var(--green),var(--cyan));
+}
+.section-sub{font-size:12px;color:var(--muted);}
+
+/* ════════════════════════════
    KPI CARDS
-========================= */
-
-.cards{
-
-display:grid;
-
-grid-template-columns:
-repeat(auto-fit,minmax(240px,1fr));
-
-gap:22px;
-
-margin-bottom:30px;
+════════════════════════════ */
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+  margin-bottom:24px;
 }
 
-.card{
-
-background:var(--card);
-
-border:1px solid var(--border);
-
-backdrop-filter:blur(18px);
-
-border-radius:28px;
-
-padding:26px;
-
-position:relative;
-
-overflow:hidden;
+.kpi-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px;
+  position:relative;overflow:hidden;
+  transition:transform .25s, border-color .25s, box-shadow .25s;
+  cursor:default;
+}
+.kpi-card:hover{
+  transform:translateY(-3px);
+  border-color:var(--border2);
 }
 
-.card::before{
+/* accent glow top */
+.kpi-card::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  border-radius:var(--radius) var(--radius) 0 0;
+}
+.kpi-card.c-red::before{background:linear-gradient(90deg,var(--red),#ff8f70);}
+.kpi-card.c-blue::before{background:linear-gradient(90deg,var(--cyan),#3b82f6);}
+.kpi-card.c-green::before{background:linear-gradient(90deg,var(--green),#0ea5e9);}
+.kpi-card.c-violet::before{background:linear-gradient(90deg,var(--violet),#ec4899);}
+.kpi-card.c-amber::before{background:linear-gradient(90deg,var(--amber),#f97316);}
 
-content:'';
+/* glow bg */
+.kpi-card::after{
+  content:'';position:absolute;
+  top:-40px;right:-40px;
+  width:120px;height:120px;border-radius:50%;
+  opacity:.5;pointer-events:none;
+}
+.kpi-card.c-red::after{background:radial-gradient(var(--red-dim),transparent 70%);}
+.kpi-card.c-blue::after{background:radial-gradient(var(--cyan-dim),transparent 70%);}
+.kpi-card.c-green::after{background:radial-gradient(var(--green-dim),transparent 70%);}
+.kpi-card.c-violet::after{background:radial-gradient(var(--violet-dim),transparent 70%);}
+.kpi-card.c-amber::after{background:radial-gradient(var(--amber-dim),transparent 70%);}
 
-position:absolute;
+.kpi-top{
+  display:flex;justify-content:space-between;
+  align-items:flex-start;margin-bottom:16px;
+}
+.kpi-icon{
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+}
+.c-red .kpi-icon{background:var(--red-dim);color:var(--red);}
+.c-blue .kpi-icon{background:var(--cyan-dim);color:var(--cyan);}
+.c-green .kpi-icon{background:var(--green-dim);color:var(--green);}
+.c-violet .kpi-icon{background:var(--violet-dim);color:var(--violet);}
+.c-amber .kpi-icon{background:var(--amber-dim);color:var(--amber);}
 
-top:0;
-left:0;
-right:0;
+.kpi-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:1px;
+  padding:3px 8px;border-radius:99px;text-transform:uppercase;
+}
+.c-red .kpi-badge{background:var(--red-dim);color:var(--red);}
+.c-blue .kpi-badge{background:var(--cyan-dim);color:var(--cyan);}
+.c-green .kpi-badge{background:var(--green-dim);color:var(--green);}
+.c-violet .kpi-badge{background:var(--violet-dim);color:var(--violet);}
+.c-amber .kpi-badge{background:var(--amber-dim);color:var(--amber);}
 
-height:4px;
+.kpi-label{
+  font-size:11px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);margin-bottom:8px;
+}
+.kpi-value{
+  font-family:'Syne',sans-serif;
+  font-size:34px;font-weight:800;color:white;line-height:1;
+}
+.kpi-value .unit{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:15px;font-weight:400;color:var(--muted);margin-left:3px;
 }
 
-.red::before{
-background:linear-gradient(90deg,#ef4444,#f97316);
-}
-
-.blue::before{
-background:linear-gradient(90deg,#3b82f6,#06b6d4);
-}
-
-.green::before{
-background:linear-gradient(90deg,#22c55e,#14b8a6);
-}
-
-.orange::before{
-background:linear-gradient(90deg,#f59e0b,#f97316);
-}
-
-.purple::before{
-background:linear-gradient(90deg,#8b5cf6,#ec4899);
-}
-
-.card-top{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-
-margin-bottom:20px;
-}
-
-.card-icon{
-
-width:58px;
-height:58px;
-
-border-radius:18px;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-font-size:22px;
-
-color:white;
-}
-
-.red .card-icon{
-background:rgba(239,68,68,0.15);
-}
-
-.blue .card-icon{
-background:rgba(59,130,246,0.15);
-}
-
-.green .card-icon{
-background:rgba(34,197,94,0.15);
-}
-
-.orange .card-icon{
-background:rgba(245,158,11,0.15);
-}
-
-.purple .card-icon{
-background:rgba(139,92,246,0.15);
-}
-
-.card-label{
-
-font-size:13px;
-
-margin-bottom:10px;
-
-color:#94a3b8;
-
-text-transform:uppercase;
-
-letter-spacing:1px;
-}
-
-.card-value{
-
-font-size:40px;
-
-font-weight:800;
-
-color:white;
-}
-
-.unit{
-
-font-size:18px;
-
-color:#94a3b8;
-}
-
-/* =========================
-   ANALYTICS
-========================= */
-
+/* ════════════════════════════
+   ANALYTICS STRIP
+════════════════════════════ */
 .analytics-grid{
-
-display:grid;
-
-grid-template-columns:
-repeat(auto-fit,minmax(240px,1fr));
-
-gap:22px;
-
-margin-bottom:30px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:14px;
+  margin-bottom:24px;
 }
-
-.analytics-card{
-
-background:var(--card);
-
-border:1px solid var(--border);
-
-backdrop-filter:blur(18px);
-
-border-radius:24px;
-
-padding:24px;
+.stat-card{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:16px;
+  transition:border-color .2s;
 }
-
-.analytics-title{
-
-font-size:13px;
-
-margin-bottom:14px;
-
-color:#94a3b8;
-
-text-transform:uppercase;
-
-letter-spacing:1px;
+.stat-card:hover{border-color:var(--border2);}
+.stat-label{
+  font-size:10px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);margin-bottom:8px;
+  display:flex;align-items:center;gap:5px;
 }
-
-.analytics-value{
-
-font-size:30px;
-
-font-weight:800;
-
-color:white;
+.stat-label i{font-size:9px;}
+.stat-value{
+  font-family:'JetBrains Mono',monospace;
+  font-size:20px;font-weight:600;color:white;
 }
+.stat-value span{font-size:12px;color:var(--muted);}
 
-/* =========================
+/* ════════════════════════════
    CHARTS
-========================= */
-
-.charts{
-
-display:grid;
-
-grid-template-columns:1fr 1fr;
-
-gap:22px;
+════════════════════════════ */
+.charts-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:auto auto;
+  gap:18px;
 }
-
 .chart-card{
-
-background:var(--card);
-
-border:1px solid var(--border);
-
-backdrop-filter:blur(18px);
-
-border-radius:30px;
-
-padding:26px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px;
+  transition:border-color .2s;
 }
-
-.chart-card.large{
-grid-column:1/-1;
-}
+.chart-card:hover{border-color:var(--border2);}
+.chart-card.wide{grid-column:1/-1;}
 
 .chart-head{
-margin-bottom:20px;
+  display:flex;align-items:flex-start;
+  justify-content:space-between;margin-bottom:20px;
 }
-
 .chart-title{
-
-font-size:18px;
-font-weight:700;
-
-color:white;
+  font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:700;color:white;
 }
-
-.chart-sub{
-
-margin-top:5px;
-
-font-size:13px;
-
-color:#94a3b8;
+.chart-sub{font-size:12px;color:var(--muted);margin-top:3px;}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap;}
+.legend-item{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:var(--muted);
 }
-
-.chart-container{
-
-position:relative;
-
-height:320px;
+.legend-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
 }
+.chart-wrap{position:relative;height:260px;}
+.chart-wrap.tall{height:220px;}
 
-/* =========================
+/* ════════════════════════════
    FOOTER
-========================= */
-
+════════════════════════════ */
 .footer{
-
-margin-top:40px;
-
-text-align:center;
-
-font-size:13px;
-
-color:#94a3b8;
-
-line-height:1.8;
+  margin-top:32px;
+  padding:20px 32px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+}
+.footer-ack{font-size:12px;color:var(--muted);line-height:1.6;max-width:600px;}
+.footer-brand{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--subtle);letter-spacing:1px;
 }
 
-/* =========================
+/* ════════════════════════════
+   MOBILE OVERLAY
+════════════════════════════ */
+.overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:99;
+  backdrop-filter:blur(3px);
+}
+.overlay.show{display:block;}
+
+/* ════════════════════════════
    RESPONSIVE
-========================= */
-
-@media(max-width:1100px){
-
-.sidebar{
-width:90px;
-overflow:hidden;
+════════════════════════════ */
+@media(max-width:1280px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .analytics-grid{grid-template-columns:repeat(3,1fr);}
 }
 
-.brand-text,
-.developer-section{
-display:none;
-}
-
-.main{
-margin-left:90px;
-width:calc(100% - 90px);
-}
+@media(max-width:1024px){
+  :root{--sidebar:240px;}
+  .charts-layout{grid-template-columns:1fr;}
+  .chart-card.wide{grid-column:auto;}
 }
 
 @media(max-width:768px){
-
-.charts{
-grid-template-columns:1fr;
+  .sidebar{
+    transform:translateX(-100%);
+    transition:transform .35s cubic-bezier(.4,0,.2,1);
+    width:280px;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;width:100%;}
+  .menu-btn{display:flex;}
+  .topbar{padding:14px 18px;}
+  .content{padding:18px;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .analytics-grid{grid-template-columns:repeat(2,1fr);}
+  .charts-layout{grid-template-columns:1fr;}
+  .time-chip{display:none;}
+  .kpi-value{font-size:28px;}
+  .footer{flex-direction:column;align-items:flex-start;padding:18px;}
 }
 
-.main{
-padding:20px;
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .analytics-grid{grid-template-columns:1fr 1fr;}
+  .topbar-left h2{font-size:17px;}
 }
 
-.topbar{
-flex-direction:column;
-align-items:flex-start;
-gap:20px;
+/* ─── ANIMATE IN ─── */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
 }
+.kpi-card{animation:fadeUp .5s both;}
+.kpi-card:nth-child(1){animation-delay:.05s;}
+.kpi-card:nth-child(2){animation-delay:.1s;}
+.kpi-card:nth-child(3){animation-delay:.15s;}
+.kpi-card:nth-child(4){animation-delay:.2s;}
+.kpi-card:nth-child(5){animation-delay:.25s;}
+.chart-card{animation:fadeUp .5s .3s both;}
 
-.card-value{
-font-size:34px;
+/* Loading shimmer */
+.shimmer{
+  background:linear-gradient(90deg,
+    var(--card) 25%,
+    rgba(255,255,255,0.04) 50%,
+    var(--card) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
 }
-
-.live-status{
-font-size:12px;
-}
+@keyframes shimmer{
+  0%{background-position:200% 0;}
+  100%{background-position:-200% 0;}
 }
 
 </style>
-
 </head>
-
 <body>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
 <div class="app">
 
-<!-- SIDEBAR -->
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<aside class="sidebar" id="sidebar">
 
-<div class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">🍄</div>
+    <div class="brand-text">
+      <h1>MycoSense AI</h1>
+      <p>Smart Cultivation<br>System</p>
+    </div>
+  </div>
 
-<!-- BRAND -->
+  <div class="nav-section">
+    <div class="nav-label">Menu</div>
+    <nav class="nav">
+      <a href="#" class="active">
+        <div class="icon"><i class="fa-solid fa-chart-line"></i></div>
+        <span>Dashboard</span>
+      </a>
+      <a href="#">
+        <div class="icon"><i class="fa-solid fa-temperature-half"></i></div>
+        <span>Environment</span>
+      </a>
+      <a href="#">
+        <div class="icon"><i class="fa-solid fa-seedling"></i></div>
+        <span>Cultivation</span>
+      </a>
+      <a href="#">
+        <div class="icon"><i class="fa-solid fa-bell"></i></div>
+        <span>Alerts</span>
+      </a>
+      <a href="#">
+        <div class="icon"><i class="fa-solid fa-gear"></i></div>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </div>
 
-<div class="brand">
+  <div class="dev-section">
+    <div class="dev-label">Developed By</div>
+    <div class="dev-card">
+      <div class="dev-name">Dr. Huidrom Dayananda Singh</div>
+      <div class="dev-role">Scientist (FMP), DSRE, ICAR-NEH Region</div>
+    </div>
+    <div class="dev-card">
+      <div class="dev-name">Dr. Hijam Jiten Singh</div>
+      <div class="dev-role">Scientist (FMP), DSRE, ICAR-NEH Region</div>
+    </div>
+    <div class="dev-card">
+      <div class="dev-name">Dr. Akoijam Ratankumar Singh</div>
+      <div class="dev-role">Sr. Scientist (Plant Pathology), ICAR Manipur Center</div>
+    </div>
+  </div>
 
-<div class="brand-icon">
-🍄
-</div>
+  <div class="sidebar-status">
+    <div class="status-pill">
+      <div class="pulse-dot"></div>
+      <div class="status-text">
+        <div class="s1">Live Monitoring</div>
+        <div class="s2">Auto-refresh 60s</div>
+      </div>
+    </div>
+  </div>
 
-<div class="brand-text">
+</aside>
 
-<h1>MycoSense AI</h1>
-
-<p>
-SMART CULTIVATION<br>
-SYSTEM
-</p>
-
-</div>
-
-</div>
-
-<!-- NAVIGATION -->
-
-<div class="nav">
-
-<a href="#" class="active">
-<i class="fa-solid fa-chart-line"></i>
-<span>Dashboard</span>
-</a>
-
-</div>
-
-<!-- DEVELOPER SECTION -->
-
-<div class="developer-section">
-
-<div class="developer-title">
-Developed By
-</div>
-
-<div class="developer-card">
-
-<div class="developer-name">
-Dr. Huidrom Dayananda Singh
-</div>
-
-<div class="developer-role">
-Scientist (FMP), DSRE, ICAR Research Complex for NEH Region, Umiam, Meghalaya
-</div>
-
-</div>
-
-<div class="developer-card">
-
-<div class="developer-name">
-Dr. Hijam Jiten Singh
-</div>
-
-<div class="developer-role">
-Scientist (FMP), DSRE, ICAR Research Complex for NEH Region, Umiam, Meghalaya
-</div>
-
-</div>
-
-<div class="developer-card">
-
-<div class="developer-name">
-Dr. Akoijam Ratankumar Singh
-</div>
-
-<div class="developer-role">
-Senior Scientist (Plant Pathology), ICAR Research Complex for NEH Region Manipur Center, Lamphelpat, Manipur
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- MAIN -->
-
+<!-- ═══════════ MAIN ═══════════ -->
 <div class="main">
 
-<!-- TOPBAR -->
-
-<div class="topbar">
-
-<div>
-
-<h2>Mushroom Chamber Dashboard</h2>
-
-<p>
-Advanced environmental monitoring & intelligent cultivation analytics
-</p>
-
-<div class="live-time">
-Last Updated:
-<span id="liveDateTime">Loading...</span>
-</div>
-
-</div>
-
-<div class="live-status">
-<div class="pulse"></div>
-LIVE MONITORING
-</div>
-
-</div>
-
-<!-- KPI CARDS -->
-
-<div class="cards">
-
-<div class="card red">
-
-<div class="card-top">
-<div class="card-icon">
-<i class="fa-solid fa-temperature-half"></i>
-</div>
-</div>
-
-<div class="card-label">
-Inside Temperature
-</div>
-
-<div class="card-value">
-<span id="insideTemp">--</span>
-<span class="unit">°C</span>
-</div>
-
-</div>
-
-<div class="card blue">
-
-<div class="card-top">
-<div class="card-icon">
-<i class="fa-solid fa-temperature-quarter"></i>
-</div>
-</div>
-
-<div class="card-label">
-Outside Temperature
-</div>
-
-<div class="card-value">
-<span id="outsideTemp">--</span>
-<span class="unit">°C</span>
-</div>
-
-</div>
-
-<div class="card green">
-
-<div class="card-top">
-<div class="card-icon">
-<i class="fa-solid fa-droplet"></i>
-</div>
-</div>
-
-<div class="card-label">
-Inside Humidity
-</div>
-
-<div class="card-value">
-<span id="insideHum">--</span>
-<span class="unit">%</span>
-</div>
-
-</div>
-
-<div class="card purple">
-
-<div class="card-top">
-<div class="card-icon">
-<i class="fa-solid fa-cloud-rain"></i>
-</div>
-</div>
-
-<div class="card-label">
-Outside Humidity
-</div>
-
-<div class="card-value">
-<span id="outsideHum">--</span>
-<span class="unit">%</span>
-</div>
-
-</div>
-
-<div class="card orange">
-
-<div class="card-top">
-<div class="card-icon">
-<i class="fa-solid fa-sun"></i>
-</div>
-</div>
-
-<div class="card-label">
-Radiation
-</div>
-
-<div class="card-value">
-<span id="lux">--</span>
-<span class="unit">lux</span>
-</div>
-
-</div>
-
-</div>
-
-<!-- ANALYTICS -->
-
-<div class="analytics-grid">
-
-<div class="analytics-card">
-<div class="analytics-title">
-12 h Average Temperature
-</div>
-<div class="analytics-value">
-<span id="avgTemp">--</span> °C
-</div>
-</div>
-
-<div class="analytics-card">
-<div class="analytics-title">
-12 h Std Dev Temperature
-</div>
-<div class="analytics-value">
-<span id="stdTemp">--</span>
-</div>
-</div>
-
-<div class="analytics-card">
-<div class="analytics-title">
-12 h Average Humidity
-</div>
-<div class="analytics-value">
-<span id="avgHum">--</span> %
-</div>
-</div>
-
-<div class="analytics-card">
-<div class="analytics-title">
-12 h Std Dev Humidity
-</div>
-<div class="analytics-value">
-<span id="stdHum">--</span>
-</div>
-</div>
-
-<div class="analytics-card">
-<div class="analytics-title">
-12 h Average Radiation
-</div>
-<div class="analytics-value">
-<span id="avgLux">--</span> lux
-</div>
-</div>
-
-<div class="analytics-card">
-<div class="analytics-title">
-12 h Std Dev Radiation
-</div>
-<div class="analytics-value">
-<span id="stdLux">--</span>
-</div>
-</div>
-
-</div>
-
-<!-- CHARTS -->
-
-<div class="charts">
-
-<div class="chart-card large">
-
-<div class="chart-head">
-
-<div class="chart-title">
-Temperature Analytics
-</div>
-
-<div class="chart-sub">
-Inside vs Outside Temperature
-</div>
-
-</div>
-
-<div class="chart-container">
-<canvas id="tempChart"></canvas>
-</div>
-
-</div>
-
-<div class="chart-card">
-
-<div class="chart-head">
-
-<div class="chart-title">
-Humidity Analytics
-</div>
-
-<div class="chart-sub">
-Inside vs Outside Humidity
-</div>
-
-</div>
-
-<div class="chart-container">
-<canvas id="humChart"></canvas>
-</div>
-
-</div>
-
-<div class="chart-card">
-
-<div class="chart-head">
-
-<div class="chart-title">
-Radiation Analytics
-</div>
-
-<div class="chart-sub">
-Lux variation
-</div>
-
-</div>
-
-<div class="chart-container">
-<canvas id="luxChart"></canvas>
-</div>
-
-</div>
-
-</div>
-
-<!-- FOOTER -->
-
-<div class="footer">
-
-Thanks to Director, ICAR Research Complex for NEH Region, Umiam for providing the necessary facilities and encouragement to carry out this work.
-
-</div>
-
-</div>
-
-</div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="menu-btn" onclick="toggleSidebar()">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="topbar-left">
+        <h2>Mushroom Chamber Dashboard</h2>
+        <p>Environmental monitoring &amp; cultivation analytics</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="time-chip">
+        <i class="fa-regular fa-clock"></i>
+        <span id="liveDateTime">Loading…</span>
+      </div>
+      <div class="live-badge">
+        <div class="dot"></div>
+        <span>Live</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI SECTION -->
+    <div class="section-head">
+      <div class="section-title">Sensor Readings</div>
+      <div class="section-sub">Real-time chamber data</div>
+    </div>
+
+    <div class="kpi-grid">
+
+      <div class="kpi-card c-red">
+        <div class="kpi-top">
+          <div class="kpi-icon"><i class="fa-solid fa-temperature-half"></i></div>
+          <div class="kpi-badge">Inside</div>
+        </div>
+        <div class="kpi-label">Temperature</div>
+        <div class="kpi-value">
+          <span id="insideTemp">--</span><span class="unit">°C</span>
+        </div>
+      </div>
+
+      <div class="kpi-card c-blue">
+        <div class="kpi-top">
+          <div class="kpi-icon"><i class="fa-solid fa-temperature-quarter"></i></div>
+          <div class="kpi-badge">Outside</div>
+        </div>
+        <div class="kpi-label">Temperature</div>
+        <div class="kpi-value">
+          <span id="outsideTemp">--</span><span class="unit">°C</span>
+        </div>
+      </div>
+
+      <div class="kpi-card c-green">
+        <div class="kpi-top">
+          <div class="kpi-icon"><i class="fa-solid fa-droplet"></i></div>
+          <div class="kpi-badge">Inside</div>
+        </div>
+        <div class="kpi-label">Humidity</div>
+        <div class="kpi-value">
+          <span id="insideHum">--</span><span class="unit">%</span>
+        </div>
+      </div>
+
+      <div class="kpi-card c-violet">
+        <div class="kpi-top">
+          <div class="kpi-icon"><i class="fa-solid fa-cloud-rain"></i></div>
+          <div class="kpi-badge">Outside</div>
+        </div>
+        <div class="kpi-label">Humidity</div>
+        <div class="kpi-value">
+          <span id="outsideHum">--</span><span class="unit">%</span>
+        </div>
+      </div>
+
+      <div class="kpi-card c-amber">
+        <div class="kpi-top">
+          <div class="kpi-icon"><i class="fa-solid fa-sun"></i></div>
+          <div class="kpi-badge">Sensor</div>
+        </div>
+        <div class="kpi-label">Radiation</div>
+        <div class="kpi-value">
+          <span id="lux">--</span><span class="unit">lux</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ANALYTICS SECTION -->
+    <div class="section-head">
+      <div class="section-title">12-Hour Analytics</div>
+      <div class="section-sub">Mean &amp; standard deviation</div>
+    </div>
+
+    <div class="analytics-grid">
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-temperature-half" style="color:var(--red)"></i> Avg Temperature</div>
+        <div class="stat-value"><span id="avgTemp">--</span> <span>°C</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--red)"></i> Std Dev Temp</div>
+        <div class="stat-value"><span id="stdTemp">--</span> <span>σ</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-droplet" style="color:var(--green)"></i> Avg Humidity</div>
+        <div class="stat-value"><span id="avgHum">--</span> <span>%</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--green)"></i> Std Dev Humidity</div>
+        <div class="stat-value"><span id="stdHum">--</span> <span>σ</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-sun" style="color:var(--amber)"></i> Avg Radiation</div>
+        <div class="stat-value"><span id="avgLux">--</span> <span>lux</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--amber)"></i> Std Dev Radiation</div>
+        <div class="stat-value"><span id="stdLux">--</span> <span>σ</span></div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="section-head">
+      <div class="section-title">Trend Analysis</div>
+      <div class="section-sub">12-hour historical view</div>
+    </div>
+
+    <div class="charts-layout">
+
+      <div class="chart-card wide">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Temperature Trends</div>
+            <div class="chart-sub">Inside vs Outside — 12h window</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Inside</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div> Outside</div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Humidity</div>
+            <div class="chart-sub">Inside vs Outside</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Inside</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--violet)"></div> Outside</div>
+          </div>
+        </div>
+        <div class="chart-wrap tall"><canvas id="humChart"></canvas></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Radiation</div>
+            <div class="chart-sub">Lux variation over time</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div> Radiation</div>
+          </div>
+        </div>
+        <div class="chart-wrap tall"><canvas id="luxChart"></canvas></div>
+      </div>
+
+    </div>
+
+  </div><!-- /content -->
+
+  <div class="footer">
+    <div class="footer-ack">
+      <i class="fa-solid fa-award" style="color:var(--amber);margin-right:6px;"></i>
+      Thanks to the Director, ICAR Research Complex for NEH Region, Umiam, Meghalaya for providing necessary facilities and encouragement.
+    </div>
+    <div class="footer-brand">MYCOSENSE AI © 2025</div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /app -->
 
 <script>
-
-const SHEET_ID =
-"1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU";
-
+/* ════════════════════════════════
+   CONFIG
+════════════════════════════════ */
+const SHEET_ID = "1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU";
 const SHEET_GID = "0";
+const csvURL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+const proxyURL = `https://api.allorigins.win/get?url=${encodeURIComponent(csvURL)}`;
 
-const csvURL =
-`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+let tempChart, humChart, luxChart;
 
-const proxyURL =
-`https://api.allorigins.win/get?url=${encodeURIComponent(csvURL)}`;
+/* ════════════════════════════════
+   MOBILE SIDEBAR
+════════════════════════════════ */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
 
-let tempChart;
-let humChart;
-let luxChart;
-
-/* =========================
+/* ════════════════════════════════
    CSV PARSER
-========================= */
-
+════════════════════════════════ */
 function parseCSV(text){
-
-const lines = text.trim().split('\n');
-
-const headers =
-lines[0]
-.split(',')
-.map(h=>h.trim().replace(/^"|"$/g,''));
-
-return lines.slice(1).map(line=>{
-
-const cols = [];
-
-let cur = '';
-let inQ = false;
-
-for(let i=0;i<line.length;i++){
-
-if(line[i] === '"'){
-inQ = !inQ;
+  const lines = text.trim().split('\n');
+  const headers = lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+  return lines.slice(1).map(line=>{
+    const cols=[];let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      if(line[i]==='"'){inQ=!inQ;}
+      else if(line[i]===','&&!inQ){cols.push(cur.trim());cur='';}
+      else{cur+=line[i];}
+    }
+    cols.push(cur.trim());
+    const row={};
+    headers.forEach((h,i)=>{row[h]=(cols[i]||'').replace(/^"|"$/g,'').trim();});
+    return row;
+  });
 }
 
-else if(line[i] === ',' && !inQ){
+/* ════════════════════════════════
+   STATS
+════════════════════════════════ */
+function avg(a){return a.reduce((s,v)=>s+v,0)/a.length;}
+function std(a){const m=avg(a);return Math.sqrt(avg(a.map(v=>Math.pow(v-m,2))));}
 
-cols.push(cur.trim());
-
-cur = '';
-}
-
-else{
-cur += line[i];
-}
-}
-
-cols.push(cur.trim());
-
-const row = {};
-
-headers.forEach((h,i)=>{
-
-row[h] =
-(cols[i] || '')
-.replace(/^"|"$/g,'')
-.trim();
+/* ════════════════════════════════
+   CHART CONFIG
+════════════════════════════════ */
+const baseOpts = ()=>({
+  responsive:true,
+  maintainAspectRatio:false,
+  interaction:{mode:'index',intersect:false},
+  plugins:{
+    legend:{display:false},
+    tooltip:{
+      backgroundColor:'rgba(8,15,26,0.92)',
+      borderColor:'rgba(255,255,255,0.08)',
+      borderWidth:1,
+      titleColor:'#e8f4fd',
+      bodyColor:'#94a3b8',
+      padding:12,
+      cornerRadius:10,
+      displayColors:true,
+      boxPadding:4
+    }
+  },
+  scales:{
+    x:{
+      ticks:{color:'#3a5570',font:{size:11}},
+      grid:{color:'rgba(255,255,255,0.04)'},
+      border:{color:'transparent'}
+    },
+    y:{
+      ticks:{color:'#3a5570',font:{size:11}},
+      grid:{color:'rgba(255,255,255,0.04)'},
+      border:{color:'transparent'}
+    }
+  }
 });
 
-return row;
-});
+/* thinned labels */
+function thinLabels(arr,max=20){
+  const step=Math.max(1,Math.floor(arr.length/max));
+  return arr.map((v,i)=>i%step===0?v.slice(11,16):'');
 }
 
-/* =========================
-   STATISTICS
-========================= */
-
-function average(arr){
-
-return arr.reduce((a,b)=>a+b,0)/arr.length;
-}
-
-function standardDeviation(arr){
-
-const avg = average(arr);
-
-const squareDiffs =
-arr.map(v => Math.pow(v - avg,2));
-
-const avgSquareDiff =
-average(squareDiffs);
-
-return Math.sqrt(avgSquareDiff);
-}
-
-/* =========================
-   CHART OPTIONS
-========================= */
-
-function chartOptions(){
-
-return{
-
-responsive:true,
-
-maintainAspectRatio:false,
-
-interaction:{
-mode:'index',
-intersect:false
-},
-
-plugins:{
-
-legend:{
-
-labels:{
-color:'#cbd5e1',
-usePointStyle:true
-}
-}
-},
-
-scales:{
-
-x:{
-
-ticks:{
-color:'#94a3b8'
-},
-
-grid:{
-color:'rgba(255,255,255,0.05)'
-}
-},
-
-y:{
-
-beginAtZero:true,
-
-ticks:{
-color:'#94a3b8'
-},
-
-grid:{
-color:'rgba(255,255,255,0.05)'
-}
-}
-}
-}
-}
-
-/* =========================
-   FETCH LIVE DATA
-========================= */
-
+/* ════════════════════════════════
+   FETCH DATA
+════════════════════════════════ */
 async function fetchData(){
+  let rawCSV=null;
+  try{const r=await fetch(csvURL);if(r.ok)rawCSV=await r.text();}catch(e){}
+  if(!rawCSV){
+    try{const r=await fetch(proxyURL);const w=await r.json();rawCSV=w.contents;}
+    catch(e){console.warn("Sheet load error");return;}
+  }
+  if(!rawCSV)return;
 
-let rawCSV = null;
+  const data=parseCSV(rawCSV);
+  if(!data.length)return;
 
-try{
+  const parsed=data.map(r=>{
+    const iso=`${(r["Date"]||"").trim()}T${(r["Time"]||"").trim()}`;
+    const ms=new Date(iso).getTime();
+    return{ms,iso,r};
+  }).filter(d=>!isNaN(d.ms));
 
-const res = await fetch(csvURL);
+  if(!parsed.length)return;
 
-if(res.ok){
-rawCSV = await res.text();
+  const latestMs=parsed[parsed.length-1].ms;
+  const cut=latestMs-(12*60*60*1000);
+  const win=parsed.filter(d=>d.ms>cut&&d.ms<=latestMs);
+  if(!win.length)return;
+
+  const latest=win[win.length-1].r;
+
+  /* KPI cards */
+  setText("insideTemp",  latest.InsideTemperature);
+  setText("outsideTemp", latest.OutsideTemperature);
+  setText("insideHum",   latest.InsideHumidity);
+  setText("outsideHum",  latest.OutsideHumidity);
+  setText("lux",         latest["Radiation (Lux)"]);
+
+  /* Timestamp */
+  document.getElementById("liveDateTime").textContent=
+    `${latest.Date}  ·  ${latest.Time}`;
+
+  /* Arrays */
+  const labels=win.map(d=>d.iso);
+  const iT=win.map(d=>+d.r.InsideTemperature);
+  const oT=win.map(d=>+d.r.OutsideTemperature);
+  const iH=win.map(d=>+d.r.InsideHumidity);
+  const oH=win.map(d=>+d.r.OutsideHumidity);
+  const lx=win.map(d=>+d.r["Radiation (Lux)"]);
+  const tl=thinLabels(labels);
+
+  /* Analytics */
+  setText("avgTemp", avg(iT).toFixed(2));
+  setText("stdTemp", std(iT).toFixed(2));
+  setText("avgHum",  avg(iH).toFixed(2));
+  setText("stdHum",  std(iH).toFixed(2));
+  setText("avgLux",  avg(lx).toFixed(2));
+  setText("stdLux",  std(lx).toFixed(2));
+
+  /* Charts */
+  if(tempChart) tempChart.destroy();
+  if(humChart)  humChart.destroy();
+  if(luxChart)  luxChart.destroy();
+
+  const opt=baseOpts();
+  const optLine={...opt};
+
+  /* Temperature */
+  tempChart=new Chart(document.getElementById('tempChart'),{
+    type:'line',
+    data:{
+      labels:tl,
+      datasets:[
+        {label:'Inside Temp (°C)',data:iT,
+          borderColor:'#00e5a0',backgroundColor:'rgba(0,229,160,0.07)',
+          fill:true,tension:.45,pointRadius:0,borderWidth:2.5},
+        {label:'Outside Temp (°C)',data:oT,
+          borderColor:'#00c9ff',backgroundColor:'rgba(0,201,255,0.06)',
+          fill:true,tension:.45,pointRadius:0,borderWidth:2.5}
+      ]
+    },
+    options:optLine
+  });
+
+  /* Humidity */
+  humChart=new Chart(document.getElementById('humChart'),{
+    type:'line',
+    data:{
+      labels:tl,
+      datasets:[
+        {label:'Inside Humidity (%)',data:iH,
+          borderColor:'#00e5a0',backgroundColor:'rgba(0,229,160,0.07)',
+          fill:true,tension:.45,pointRadius:0,borderWidth:2.5},
+        {label:'Outside Humidity (%)',data:oH,
+          borderColor:'#9f7aea',backgroundColor:'rgba(159,122,234,0.07)',
+          fill:true,tension:.45,pointRadius:0,borderWidth:2.5}
+      ]
+    },
+    options:opt
+  });
+
+  /* Radiation */
+  luxChart=new Chart(document.getElementById('luxChart'),{
+    type:'bar',
+    data:{
+      labels:tl,
+      datasets:[
+        {label:'Radiation (lux)',data:lx,
+          backgroundColor:'rgba(255,183,0,0.55)',
+          borderColor:'rgba(255,183,0,0.9)',
+          borderWidth:1,borderRadius:5,
+          borderSkipped:false}
+      ]
+    },
+    options:{...opt,scales:{...opt.scales,x:{...opt.scales.x,stacked:false}}}
+  });
 }
 
-}catch(e){}
-
-if(!rawCSV){
-
-try{
-
-const res = await fetch(proxyURL);
-
-const wrapper = await res.json();
-
-rawCSV = wrapper.contents;
-
-}catch(e){
-
-console.log("Error loading sheet");
-
-return;
-}
+function setText(id,val){
+  const el=document.getElementById(id);
+  if(el) el.textContent=val??'--';
 }
 
-if(!rawCSV) return;
-
-const data = parseCSV(rawCSV);
-
-if(data.length === 0) return;
-
-const parsed = data.map(r=>{
-
-const dateStr =
-(r["Date"] || "").trim();
-
-const timeStr =
-(r["Time"] || "").trim();
-
-const iso =
-`${dateStr}T${timeStr}`;
-
-const ms =
-new Date(iso).getTime();
-
-return {ms, iso, r};
-
-}).filter(d=>!isNaN(d.ms));
-
-if(parsed.length === 0) return;
-
-const latestMs =
-parsed[parsed.length - 1].ms;
-
-const cutoffMs =
-latestMs - (12 * 60 * 60 * 1000);
-
-const window12h =
-parsed.filter(d =>
-d.ms > cutoffMs &&
-d.ms <= latestMs
-);
-
-const latest =
-window12h[window12h.length - 1].r;
-
-/* =========================
-   UPDATE CARDS
-========================= */
-
-document.getElementById("insideTemp")
-.textContent =
-latest.InsideTemperature;
-
-document.getElementById("outsideTemp")
-.textContent =
-latest.OutsideTemperature;
-
-document.getElementById("insideHum")
-.textContent =
-latest.InsideHumidity;
-
-document.getElementById("outsideHum")
-.textContent =
-latest.OutsideHumidity;
-
-document.getElementById("lux")
-.textContent =
-latest["Radiation (Lux)"];
-
-/* =========================
-   UPDATE TIME
-========================= */
-
-document.getElementById("liveDateTime")
-.textContent =
-`${latest.Date} • ${latest.Time}`;
-
-/* =========================
-   DATA ARRAYS
-========================= */
-
-const labels =
-window12h.map(d => d.iso);
-
-const insideTemp =
-window12h.map(d =>
-Number(d.r.InsideTemperature)
-);
-
-const outsideTemp =
-window12h.map(d =>
-Number(d.r.OutsideTemperature)
-);
-
-const insideHum =
-window12h.map(d =>
-Number(d.r.InsideHumidity)
-);
-
-const outsideHum =
-window12h.map(d =>
-Number(d.r.OutsideHumidity)
-);
-
-const luxData =
-window12h.map(d =>
-Number(d.r["Radiation (Lux)"])
-);
-
-/* =========================
-   STATISTICS
-========================= */
-
-document.getElementById("avgTemp")
-.textContent =
-average(insideTemp).toFixed(2);
-
-document.getElementById("stdTemp")
-.textContent =
-standardDeviation(insideTemp).toFixed(2);
-
-document.getElementById("avgHum")
-.textContent =
-average(insideHum).toFixed(2);
-
-document.getElementById("stdHum")
-.textContent =
-standardDeviation(insideHum).toFixed(2);
-
-document.getElementById("avgLux")
-.textContent =
-average(luxData).toFixed(2);
-
-document.getElementById("stdLux")
-.textContent =
-standardDeviation(luxData).toFixed(2);
-
-/* =========================
-   DESTROY OLD CHARTS
-========================= */
-
-if(tempChart) tempChart.destroy();
-
-if(humChart) humChart.destroy();
-
-if(luxChart) luxChart.destroy();
-
-/* =========================
-   TEMPERATURE CHART
-========================= */
-
-tempChart = new Chart(
-document.getElementById('tempChart'),
-
-{
-type:'line',
-
-data:{
-
-labels,
-
-datasets:[
-
-{
-label:'Inside Temp',
-
-data:insideTemp,
-
-borderColor:'#22c55e',
-
-backgroundColor:'rgba(34,197,94,0.12)',
-
-fill:true,
-
-tension:0.4,
-
-pointRadius:0,
-
-borderWidth:3
-},
-
-{
-label:'Outside Temp',
-
-data:outsideTemp,
-
-borderColor:'#06b6d4',
-
-backgroundColor:'rgba(6,182,212,0.12)',
-
-fill:true,
-
-tension:0.4,
-
-pointRadius:0,
-
-borderWidth:3
-}
-]
-},
-
-options:chartOptions()
-
-}
-);
-
-/* =========================
-   HUMIDITY CHART
-========================= */
-
-humChart = new Chart(
-document.getElementById('humChart'),
-
-{
-type:'line',
-
-data:{
-
-labels,
-
-datasets:[
-
-{
-label:'Inside Humidity',
-
-data:insideHum,
-
-borderColor:'#22c55e',
-
-backgroundColor:'rgba(34,197,94,0.12)',
-
-fill:true,
-
-tension:0.4,
-
-pointRadius:0,
-
-borderWidth:3
-},
-
-{
-label:'Outside Humidity',
-
-data:outsideHum,
-
-borderColor:'#8b5cf6',
-
-backgroundColor:'rgba(139,92,246,0.12)',
-
-fill:true,
-
-tension:0.4,
-
-pointRadius:0,
-
-borderWidth:3
-}
-]
-},
-
-options:chartOptions()
-
-}
-);
-
-/* =========================
-   RADIATION CHART
-========================= */
-
-luxChart = new Chart(
-document.getElementById('luxChart'),
-
-{
-type:'bar',
-
-data:{
-
-labels,
-
-datasets:[
-
-{
-label:'Radiation',
-
-data:luxData,
-
-backgroundColor:'rgba(245,158,11,0.7)',
-
-borderRadius:10
-}
-]
-},
-
-options:chartOptions()
-
-}
-);
-
-}
-
-/* =========================
-   INITIAL LOAD
-========================= */
-
+/* ════════════════════════════════
+   INIT
+════════════════════════════════ */
 fetchData();
-
-/* =========================
-   AUTO REFRESH
-========================= */
-
 setInterval(fetchData,60000);
-
 </script>
-
 </body>
 </html>
-```
