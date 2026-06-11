@@ -523,7 +523,7 @@ body::after{
   <div class="brand">
     <div class="brand-icon">🍄</div>
     <div class="brand-text">
-      <h1>IoT Dashboard</h1>
+      <h1>IoT_Dashboard</h1>
       <p>Smart Cultivation<br>System</p>
     </div>
   </div>
@@ -758,13 +758,12 @@ body::after{
         <div class="chart-head">
           <div>
             <div class="chart-title">CO₂ Concentration</div>
-            <div class="chart-sub">ppm variation over 12h — dashed line marks 1000 ppm threshold</div>
+            <div class="chart-sub">ppm variation over 12h</div>
           </div>
           <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
             <div class="chart-legend">
               <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> CO₂ (ppm)</div>
             </div>
-            <div class="co2-legend-note">1000 ppm alert threshold</div>
           </div>
         </div>
         <div class="chart-wrap"><canvas id="co2Chart"></canvas></div>
@@ -1017,18 +1016,6 @@ async function fetchData(){
     data:{
       labels:tl,
       datasets:[
-        /* threshold line rendered as a dataset */
-        {
-          label:'Alert Threshold (1000 ppm)',
-          data:Array(tl.length).fill(1000),
-          borderColor:'rgba(255,77,106,0.55)',
-          borderWidth:1.5,
-          borderDash:[6,4],
-          pointRadius:0,
-          fill:false,
-          tension:0,
-          order:0
-        },
         {
           label:'CO₂ (ppm)',data:co,
           borderColor:'#2dd4bf',
