@@ -34,18 +34,18 @@
   --red-dim:rgba(255,77,106,0.12);
   --violet:#9f7aea;
   --violet-dim:rgba(159,122,234,0.12);
+  --teal:#2dd4bf;
+  --teal-dim:rgba(45,212,191,0.12);
 
   --sidebar:260px;
   --radius:20px;
   --radius-sm:12px;
 }
 
-/* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:99px;}
 
-/* ─── BODY ─── */
 body{
   font-family:'Space Grotesk',sans-serif;
   background:var(--bg);
@@ -54,7 +54,6 @@ body{
   overflow-x:hidden;
 }
 
-/* animated mesh bg */
 body::before{
   content:'';
   position:fixed;inset:0;
@@ -66,7 +65,6 @@ body::before{
   z-index:0;
 }
 
-/* grid lines overlay */
 body::after{
   content:'';
   position:fixed;inset:0;
@@ -78,12 +76,9 @@ body::after{
   z-index:0;
 }
 
-/* ─── APP SHELL ─── */
 .app{display:flex;min-height:100vh;position:relative;z-index:1;}
 
-/* ════════════════════════════
-   SIDEBAR
-════════════════════════════ */
+/* ════ SIDEBAR ════ */
 .sidebar{
   width:var(--sidebar);
   position:fixed;top:0;left:0;bottom:0;
@@ -91,20 +86,17 @@ body::after{
   backdrop-filter:blur(24px);
   border-right:1px solid var(--border);
   display:flex;flex-direction:column;
-  padding:0;
-  overflow:hidden;
+  padding:0;overflow:hidden;
   z-index:100;
   transition:width .35s cubic-bezier(.4,0,.2,1);
 }
 
-/* brand */
 .brand{
   display:flex;align-items:center;gap:14px;
   padding:28px 22px 24px;
   border-bottom:1px solid var(--border);
   flex-shrink:0;
 }
-
 .brand-icon{
   width:48px;height:48px;border-radius:14px;
   background:linear-gradient(135deg,var(--green),var(--cyan));
@@ -118,23 +110,18 @@ body::after{
   background:linear-gradient(135deg,rgba(0,229,160,0.5),rgba(0,201,255,0.5));
   z-index:-1;filter:blur(8px);
 }
-
 .brand-text h1{
   font-family:'Syne',sans-serif;
   font-size:17px;font-weight:800;
-  color:white;letter-spacing:-.3px;
-  white-space:nowrap;
+  color:white;letter-spacing:-.3px;white-space:nowrap;
 }
 .brand-text p{
   font-family:'JetBrains Mono',monospace;
   font-size:9px;color:var(--muted);
   letter-spacing:1.5px;line-height:1.6;
-  text-transform:uppercase;
-  white-space:nowrap;
-  margin-top:3px;
+  text-transform:uppercase;white-space:nowrap;margin-top:3px;
 }
 
-/* nav */
 .nav-section{padding:20px 14px 10px;}
 .nav-label{
   font-family:'JetBrains Mono',monospace;
@@ -155,8 +142,7 @@ body::after{
   width:32px;height:32px;border-radius:9px;
   display:flex;align-items:center;justify-content:center;
   font-size:13px;flex-shrink:0;
-  background:rgba(255,255,255,0.04);
-  transition:.2s;
+  background:rgba(255,255,255,0.04);transition:.2s;
 }
 .nav a:hover{color:var(--text);background:rgba(255,255,255,0.04);}
 .nav a:hover .icon{background:rgba(255,255,255,0.07);}
@@ -175,10 +161,8 @@ body::after{
   background:linear-gradient(to bottom,var(--green),var(--cyan));
 }
 
-/* status pill */
 .sidebar-status{
-  margin:auto 14px 0;
-  padding:0 0 20px;
+  margin:auto 14px 0;padding:0 0 20px;
 }
 .status-pill{
   display:flex;align-items:center;gap:10px;
@@ -196,7 +180,6 @@ body::after{
   0%,100%{transform:scale(1);opacity:1;}
   50%{transform:scale(1.5);opacity:.5;}
 }
-.status-text{flex:1;}
 .status-text .s1{
   font-family:'JetBrains Mono',monospace;
   font-size:10px;color:var(--green);
@@ -204,7 +187,6 @@ body::after{
 }
 .status-text .s2{font-size:11px;color:var(--muted);margin-top:2px;}
 
-/* developers */
 .dev-section{
   padding:16px 14px;border-top:1px solid var(--border);
 }
@@ -217,8 +199,7 @@ body::after{
   padding:11px 13px;border-radius:var(--radius-sm);
   background:rgba(255,255,255,0.03);
   border:1px solid var(--border);
-  margin-bottom:7px;
-  transition:.2s;
+  margin-bottom:7px;transition:.2s;
 }
 .dev-card:hover{background:rgba(255,255,255,0.05);}
 .dev-card:last-child{margin-bottom:0;}
@@ -228,31 +209,24 @@ body::after{
 }
 .dev-role{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.5;}
 
-/* ════════════════════════════
-   MAIN
-════════════════════════════ */
+/* ════ MAIN ════ */
 .main{
   margin-left:var(--sidebar);
   width:calc(100% - var(--sidebar));
-  padding:0;
-  display:flex;flex-direction:column;
-  min-height:100vh;
+  padding:0;display:flex;flex-direction:column;min-height:100vh;
 }
 
-/* ─── TOPBAR ─── */
 .topbar{
   position:sticky;top:0;z-index:50;
   padding:18px 32px;
   background:rgba(3,8,15,0.85);
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-  gap:16px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
 }
 .topbar-left h2{
   font-family:'Syne',sans-serif;
-  font-size:22px;font-weight:800;
-  color:white;letter-spacing:-.5px;
+  font-size:22px;font-weight:800;color:white;letter-spacing:-.5px;
 }
 .topbar-left p{font-size:13px;color:var(--muted);margin-top:2px;}
 .topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0;}
@@ -268,7 +242,6 @@ body::after{
   font-family:'JetBrains Mono',monospace;
   font-size:12px;color:var(--text);
 }
-
 .live-badge{
   display:flex;align-items:center;gap:8px;
   padding:8px 16px;border-radius:99px;
@@ -277,39 +250,31 @@ body::after{
 }
 .live-badge .dot{
   width:7px;height:7px;border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 8px var(--green);
+  background:var(--green);box-shadow:0 0 8px var(--green);
   animation:pulse 2s infinite;
 }
 .live-badge span{
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;font-weight:600;
-  color:var(--green);letter-spacing:1px;
+  font-size:11px;font-weight:600;color:var(--green);letter-spacing:1px;
 }
 
-/* mobile menu toggle */
 .menu-btn{
   display:none;
   width:38px;height:38px;border-radius:10px;
   background:rgba(255,255,255,0.06);border:1px solid var(--border2);
   color:var(--text);font-size:16px;
-  cursor:pointer;align-items:center;justify-content:center;
-  transition:.2s;
+  cursor:pointer;align-items:center;justify-content:center;transition:.2s;
 }
 .menu-btn:hover{background:rgba(255,255,255,0.1);}
 
-/* ─── CONTENT ─── */
 .content{padding:28px 32px;flex:1;}
 
-/* ─── SECTION HEADER ─── */
 .section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
 }
 .section-title{
   font-family:'Syne',sans-serif;
-  font-size:14px;font-weight:700;
-  color:white;letter-spacing:.5px;
+  font-size:14px;font-weight:700;color:white;letter-spacing:.5px;
   display:flex;align-items:center;gap:8px;
 }
 .section-title::before{
@@ -318,12 +283,10 @@ body::after{
 }
 .section-sub{font-size:12px;color:var(--muted);}
 
-/* ════════════════════════════
-   KPI CARDS
-════════════════════════════ */
+/* ════ KPI GRID — now 6 columns ════ */
 .kpi-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(6,1fr);
   gap:16px;
   margin-bottom:24px;
 }
@@ -337,12 +300,8 @@ body::after{
   transition:transform .25s, border-color .25s, box-shadow .25s;
   cursor:default;
 }
-.kpi-card:hover{
-  transform:translateY(-3px);
-  border-color:var(--border2);
-}
+.kpi-card:hover{transform:translateY(-3px);border-color:var(--border2);}
 
-/* accent glow top */
 .kpi-card::before{
   content:'';position:absolute;
   top:0;left:0;right:0;height:2px;
@@ -353,12 +312,11 @@ body::after{
 .kpi-card.c-green::before{background:linear-gradient(90deg,var(--green),#0ea5e9);}
 .kpi-card.c-violet::before{background:linear-gradient(90deg,var(--violet),#ec4899);}
 .kpi-card.c-amber::before{background:linear-gradient(90deg,var(--amber),#f97316);}
+.kpi-card.c-teal::before{background:linear-gradient(90deg,var(--teal),#06b6d4);}
 
-/* glow bg */
 .kpi-card::after{
   content:'';position:absolute;
-  top:-40px;right:-40px;
-  width:120px;height:120px;border-radius:50%;
+  top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;
   opacity:.5;pointer-events:none;
 }
 .kpi-card.c-red::after{background:radial-gradient(var(--red-dim),transparent 70%);}
@@ -366,21 +324,19 @@ body::after{
 .kpi-card.c-green::after{background:radial-gradient(var(--green-dim),transparent 70%);}
 .kpi-card.c-violet::after{background:radial-gradient(var(--violet-dim),transparent 70%);}
 .kpi-card.c-amber::after{background:radial-gradient(var(--amber-dim),transparent 70%);}
+.kpi-card.c-teal::after{background:radial-gradient(var(--teal-dim),transparent 70%);}
 
-.kpi-top{
-  display:flex;justify-content:space-between;
-  align-items:flex-start;margin-bottom:16px;
-}
+.kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
 .kpi-icon{
   width:42px;height:42px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:17px;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
 }
 .c-red .kpi-icon{background:var(--red-dim);color:var(--red);}
 .c-blue .kpi-icon{background:var(--cyan-dim);color:var(--cyan);}
 .c-green .kpi-icon{background:var(--green-dim);color:var(--green);}
 .c-violet .kpi-icon{background:var(--violet-dim);color:var(--violet);}
 .c-amber .kpi-icon{background:var(--amber-dim);color:var(--amber);}
+.c-teal .kpi-icon{background:var(--teal-dim);color:var(--teal);}
 
 .kpi-badge{
   font-family:'JetBrains Mono',monospace;
@@ -392,6 +348,7 @@ body::after{
 .c-green .kpi-badge{background:var(--green-dim);color:var(--green);}
 .c-violet .kpi-badge{background:var(--violet-dim);color:var(--violet);}
 .c-amber .kpi-badge{background:var(--amber-dim);color:var(--amber);}
+.c-teal .kpi-badge{background:var(--teal-dim);color:var(--teal);}
 
 .kpi-label{
   font-size:11px;text-transform:uppercase;letter-spacing:1px;
@@ -399,28 +356,35 @@ body::after{
 }
 .kpi-value{
   font-family:'Syne',sans-serif;
-  font-size:34px;font-weight:800;color:white;line-height:1;
+  font-size:30px;font-weight:800;color:white;line-height:1;
 }
 .kpi-value .unit{
   font-family:'Space Grotesk',sans-serif;
-  font-size:15px;font-weight:400;color:var(--muted);margin-left:3px;
+  font-size:13px;font-weight:400;color:var(--muted);margin-left:3px;
 }
 
-/* ════════════════════════════
-   ANALYTICS STRIP
-════════════════════════════ */
+/* CO2 status indicator */
+.co2-status{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 8px;border-radius:99px;
+}
+.co2-status.good{background:rgba(0,229,160,0.12);color:var(--green);}
+.co2-status.moderate{background:rgba(255,183,0,0.12);color:var(--amber);}
+.co2-status.high{background:rgba(255,77,106,0.12);color:var(--red);}
+
+/* ════ ANALYTICS STRIP — now 8 columns ════ */
 .analytics-grid{
   display:grid;
-  grid-template-columns:repeat(6,1fr);
+  grid-template-columns:repeat(8,1fr);
   gap:14px;
   margin-bottom:24px;
 }
 .stat-card{
-  background:var(--card2);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  padding:16px;
-  transition:border-color .2s;
+  background:var(--card2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:16px;transition:border-color .2s;
 }
 .stat-card:hover{border-color:var(--border2);}
 .stat-label{
@@ -431,13 +395,11 @@ body::after{
 .stat-label i{font-size:9px;}
 .stat-value{
   font-family:'JetBrains Mono',monospace;
-  font-size:20px;font-weight:600;color:white;
+  font-size:18px;font-weight:600;color:white;
 }
-.stat-value span{font-size:12px;color:var(--muted);}
+.stat-value span{font-size:11px;color:var(--muted);}
 
-/* ════════════════════════════
-   CHARTS
-════════════════════════════ */
+/* ════ CHARTS ════ */
 .charts-layout{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -445,11 +407,8 @@ body::after{
   gap:18px;
 }
 .chart-card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:24px;
-  transition:border-color .2s;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px;transition:border-color .2s;
 }
 .chart-card:hover{border-color:var(--border2);}
 .chart-card.wide{grid-column:1/-1;}
@@ -464,22 +423,28 @@ body::after{
 }
 .chart-sub{font-size:12px;color:var(--muted);margin-top:3px;}
 .chart-legend{display:flex;gap:12px;flex-wrap:wrap;}
-.legend-item{
-  display:flex;align-items:center;gap:6px;
-  font-size:11px;color:var(--muted);
-}
-.legend-dot{
-  width:8px;height:8px;border-radius:50%;flex-shrink:0;
-}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .chart-wrap{position:relative;height:260px;}
 .chart-wrap.tall{height:220px;}
 
-/* ════════════════════════════
-   FOOTER
-════════════════════════════ */
+/* CO2 threshold line annotation label */
+.co2-legend-note{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--muted);
+  margin-top:6px;
+  display:flex;align-items:center;gap:6px;
+}
+.co2-legend-note::before{
+  content:'';display:inline-block;
+  width:20px;height:2px;
+  border-top:2px dashed var(--red);
+  flex-shrink:0;
+}
+
+/* ════ FOOTER ════ */
 .footer{
-  margin-top:32px;
-  padding:20px 32px;
+  margin-top:32px;padding:20px 32px;
   border-top:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:12px;
@@ -490,38 +455,30 @@ body::after{
   font-size:10px;color:var(--subtle);letter-spacing:1px;
 }
 
-/* ════════════════════════════
-   MOBILE OVERLAY
-════════════════════════════ */
 .overlay{
-  display:none;
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.6);
-  z-index:99;
-  backdrop-filter:blur(3px);
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);z-index:99;backdrop-filter:blur(3px);
 }
 .overlay.show{display:block;}
 
-/* ════════════════════════════
-   RESPONSIVE
-════════════════════════════ */
+/* ════ RESPONSIVE ════ */
+@media(max-width:1400px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .analytics-grid{grid-template-columns:repeat(4,1fr);}
+}
 @media(max-width:1280px){
   .kpi-grid{grid-template-columns:repeat(3,1fr);}
-  .analytics-grid{grid-template-columns:repeat(3,1fr);}
+  .analytics-grid{grid-template-columns:repeat(4,1fr);}
 }
-
 @media(max-width:1024px){
   :root{--sidebar:240px;}
   .charts-layout{grid-template-columns:1fr;}
   .chart-card.wide{grid-column:auto;}
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .analytics-grid{grid-template-columns:repeat(4,1fr);}
 }
-
 @media(max-width:768px){
-  .sidebar{
-    transform:translateX(-100%);
-    transition:transform .35s cubic-bezier(.4,0,.2,1);
-    width:280px;
-  }
+  .sidebar{transform:translateX(-100%);transition:transform .35s cubic-bezier(.4,0,.2,1);width:280px;}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;width:100%;}
   .menu-btn{display:flex;}
@@ -531,43 +488,27 @@ body::after{
   .analytics-grid{grid-template-columns:repeat(2,1fr);}
   .charts-layout{grid-template-columns:1fr;}
   .time-chip{display:none;}
-  .kpi-value{font-size:28px;}
+  .kpi-value{font-size:26px;}
   .footer{flex-direction:column;align-items:flex-start;padding:18px;}
 }
-
 @media(max-width:480px){
   .kpi-grid{grid-template-columns:1fr 1fr;}
   .analytics-grid{grid-template-columns:1fr 1fr;}
   .topbar-left h2{font-size:17px;}
 }
 
-/* ─── ANIMATE IN ─── */
 @keyframes fadeUp{
   from{opacity:0;transform:translateY(20px);}
   to{opacity:1;transform:translateY(0);}
 }
 .kpi-card{animation:fadeUp .5s both;}
 .kpi-card:nth-child(1){animation-delay:.05s;}
-.kpi-card:nth-child(2){animation-delay:.1s;}
+.kpi-card:nth-child(2){animation-delay:.10s;}
 .kpi-card:nth-child(3){animation-delay:.15s;}
-.kpi-card:nth-child(4){animation-delay:.2s;}
+.kpi-card:nth-child(4){animation-delay:.20s;}
 .kpi-card:nth-child(5){animation-delay:.25s;}
-.chart-card{animation:fadeUp .5s .3s both;}
-
-/* Loading shimmer */
-.shimmer{
-  background:linear-gradient(90deg,
-    var(--card) 25%,
-    rgba(255,255,255,0.04) 50%,
-    var(--card) 75%);
-  background-size:200% 100%;
-  animation:shimmer 1.5s infinite;
-}
-@keyframes shimmer{
-  0%{background-position:200% 0;}
-  100%{background-position:-200% 0;}
-}
-
+.kpi-card:nth-child(6){animation-delay:.30s;}
+.chart-card{animation:fadeUp .5s .35s both;}
 </style>
 </head>
 <body>
@@ -582,7 +523,7 @@ body::after{
   <div class="brand">
     <div class="brand-icon">🍄</div>
     <div class="brand-text">
-      <h1>MycoSense AI</h1>
+      <h1>IoT Dashboard</h1>
       <p>Smart Cultivation<br>System</p>
     </div>
   </div>
@@ -628,7 +569,6 @@ body::after{
 <!-- ═══════════ MAIN ═══════════ -->
 <div class="main">
 
-  <!-- TOPBAR -->
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:12px;">
       <button class="menu-btn" onclick="toggleSidebar()">
@@ -667,9 +607,7 @@ body::after{
           <div class="kpi-badge">Inside</div>
         </div>
         <div class="kpi-label">Temperature</div>
-        <div class="kpi-value">
-          <span id="insideTemp">--</span><span class="unit">°C</span>
-        </div>
+        <div class="kpi-value"><span id="insideTemp">--</span><span class="unit">°C</span></div>
       </div>
 
       <div class="kpi-card c-blue">
@@ -678,9 +616,7 @@ body::after{
           <div class="kpi-badge">Outside</div>
         </div>
         <div class="kpi-label">Temperature</div>
-        <div class="kpi-value">
-          <span id="outsideTemp">--</span><span class="unit">°C</span>
-        </div>
+        <div class="kpi-value"><span id="outsideTemp">--</span><span class="unit">°C</span></div>
       </div>
 
       <div class="kpi-card c-green">
@@ -689,9 +625,7 @@ body::after{
           <div class="kpi-badge">Inside</div>
         </div>
         <div class="kpi-label">Humidity</div>
-        <div class="kpi-value">
-          <span id="insideHum">--</span><span class="unit">%</span>
-        </div>
+        <div class="kpi-value"><span id="insideHum">--</span><span class="unit">%</span></div>
       </div>
 
       <div class="kpi-card c-violet">
@@ -700,9 +634,7 @@ body::after{
           <div class="kpi-badge">Outside</div>
         </div>
         <div class="kpi-label">Humidity</div>
-        <div class="kpi-value">
-          <span id="outsideHum">--</span><span class="unit">%</span>
-        </div>
+        <div class="kpi-value"><span id="outsideHum">--</span><span class="unit">%</span></div>
       </div>
 
       <div class="kpi-card c-amber">
@@ -711,8 +643,20 @@ body::after{
           <div class="kpi-badge">Sensor</div>
         </div>
         <div class="kpi-label">Radiation</div>
-        <div class="kpi-value">
-          <span id="lux">--</span><span class="unit">lux</span>
+        <div class="kpi-value"><span id="lux">--</span><span class="unit">lux</span></div>
+      </div>
+
+      <!-- ★ NEW: CO2 KPI Card -->
+      <div class="kpi-card c-teal">
+        <div class="kpi-top">
+          <div class="kpi-icon"><i class="fa-solid fa-wind"></i></div>
+          <div class="kpi-badge">Chamber</div>
+        </div>
+        <div class="kpi-label">CO₂ Level</div>
+        <div class="kpi-value"><span id="co2">--</span><span class="unit">ppm</span></div>
+        <div id="co2StatusPill" class="co2-status good" style="display:none;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="co2StatusText">Optimal</span>
         </div>
       </div>
 
@@ -726,19 +670,19 @@ body::after{
 
     <div class="analytics-grid">
       <div class="stat-card">
-        <div class="stat-label"><i class="fa-solid fa-temperature-half" style="color:var(--red)"></i> Avg Temperature</div>
+        <div class="stat-label"><i class="fa-solid fa-temperature-half" style="color:var(--red)"></i> Avg Temp (Inside)</div>
         <div class="stat-value"><span id="avgTemp">--</span> <span>°C</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--red)"></i> Std Dev Temp</div>
+        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--red)"></i> Std Dev Temp (Inside)</div>
         <div class="stat-value"><span id="stdTemp">--</span> <span>σ</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="fa-solid fa-droplet" style="color:var(--green)"></i> Avg Humidity</div>
+        <div class="stat-label"><i class="fa-solid fa-droplet" style="color:var(--green)"></i> Avg Humidity (Inside)</div>
         <div class="stat-value"><span id="avgHum">--</span> <span>%</span></div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--green)"></i> Std Dev Humidity</div>
+        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--green)"></i> Std Dev Humidity (Inside)</div>
         <div class="stat-value"><span id="stdHum">--</span> <span>σ</span></div>
       </div>
       <div class="stat-card">
@@ -748,6 +692,15 @@ body::after{
       <div class="stat-card">
         <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--amber)"></i> Std Dev Radiation</div>
         <div class="stat-value"><span id="stdLux">--</span> <span>σ</span></div>
+      </div>
+      <!-- ★ NEW: CO2 analytics -->
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-wind" style="color:var(--teal)"></i> Avg CO₂</div>
+        <div class="stat-value"><span id="avgCo2">--</span> <span>ppm</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label"><i class="fa-solid fa-chart-simple" style="color:var(--teal)"></i> Std Dev CO₂</div>
+        <div class="stat-value"><span id="stdCo2">--</span> <span>σ</span></div>
       </div>
     </div>
 
@@ -800,6 +753,23 @@ body::after{
         <div class="chart-wrap tall"><canvas id="luxChart"></canvas></div>
       </div>
 
+      <!-- ★ NEW: CO2 Chart — full width -->
+      <div class="chart-card wide">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">CO₂ Concentration</div>
+            <div class="chart-sub">ppm variation over 12h — dashed line marks 1000 ppm threshold</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div> CO₂ (ppm)</div>
+            </div>
+            <div class="co2-legend-note">1000 ppm alert threshold</div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="co2Chart"></canvas></div>
+      </div>
+
     </div>
 
   </div><!-- /content -->
@@ -816,19 +786,15 @@ body::after{
 </div><!-- /app -->
 
 <script>
-/* ════════════════════════════════
-   CONFIG
-════════════════════════════════ */
+/* ════ CONFIG ════ */
 const SHEET_ID = "1gcP9cl5ddSLJV9nn5j7amj_eeLa63hiSzD2s-CNlJoU";
 const SHEET_GID = "0";
 const csvURL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 const proxyURL = `https://api.allorigins.win/get?url=${encodeURIComponent(csvURL)}`;
 
-let tempChart, humChart, luxChart;
+let tempChart, humChart, luxChart, co2Chart;
 
-/* ════════════════════════════════
-   MOBILE SIDEBAR
-════════════════════════════════ */
+/* ════ MOBILE SIDEBAR ════ */
 function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('overlay').classList.toggle('show');
@@ -838,9 +804,7 @@ function closeSidebar(){
   document.getElementById('overlay').classList.remove('show');
 }
 
-/* ════════════════════════════════
-   CSV PARSER
-════════════════════════════════ */
+/* ════ CSV PARSER ════ */
 function parseCSV(text){
   const lines = text.trim().split('\n');
   const headers = lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
@@ -858,15 +822,18 @@ function parseCSV(text){
   });
 }
 
-/* ════════════════════════════════
-   STATS
-════════════════════════════════ */
+/* ════ STATS ════ */
 function avg(a){return a.reduce((s,v)=>s+v,0)/a.length;}
 function std(a){const m=avg(a);return Math.sqrt(avg(a.map(v=>Math.pow(v-m,2))));}
 
-/* ════════════════════════════════
-   CHART CONFIG
-════════════════════════════════ */
+/* ════ CO2 STATUS ════ */
+function co2StatusInfo(ppm){
+  if(ppm < 800)  return {cls:'good',   icon:'fa-circle-check', label:'Optimal'};
+  if(ppm < 1000) return {cls:'moderate',icon:'fa-triangle-exclamation', label:'Moderate'};
+  return               {cls:'high',    icon:'fa-circle-exclamation', label:'High — Ventilate'};
+}
+
+/* ════ CHART BASE OPTIONS ════ */
 const baseOpts = ()=>({
   responsive:true,
   maintainAspectRatio:false,
@@ -899,15 +866,12 @@ const baseOpts = ()=>({
   }
 });
 
-/* thinned labels */
 function thinLabels(arr,max=20){
   const step=Math.max(1,Math.floor(arr.length/max));
   return arr.map((v,i)=>i%step===0?v.slice(11,16):'');
 }
 
-/* ════════════════════════════════
-   FETCH DATA
-════════════════════════════════ */
+/* ════ FETCH ════ */
 async function fetchData(){
   let rawCSV=null;
   try{const r=await fetch(csvURL);if(r.ok)rawCSV=await r.text();}catch(e){}
@@ -915,10 +879,10 @@ async function fetchData(){
     try{const r=await fetch(proxyURL);const w=await r.json();rawCSV=w.contents;}
     catch(e){console.warn("Sheet load error");return;}
   }
-  if(!rawCSV)return;
+  if(!rawCSV) return;
 
   const data=parseCSV(rawCSV);
-  if(!data.length)return;
+  if(!data.length) return;
 
   const parsed=data.map(r=>{
     const iso=`${(r["Date"]||"").trim()}T${(r["Time"]||"").trim()}`;
@@ -926,12 +890,12 @@ async function fetchData(){
     return{ms,iso,r};
   }).filter(d=>!isNaN(d.ms));
 
-  if(!parsed.length)return;
+  if(!parsed.length) return;
 
   const latestMs=parsed[parsed.length-1].ms;
   const cut=latestMs-(12*60*60*1000);
   const win=parsed.filter(d=>d.ms>cut&&d.ms<=latestMs);
-  if(!win.length)return;
+  if(!win.length) return;
 
   const latest=win[win.length-1].r;
 
@@ -941,6 +905,19 @@ async function fetchData(){
   setText("insideHum",   latest.InsideHumidity);
   setText("outsideHum",  latest.OutsideHumidity);
   setText("lux",         latest["Radiation (Lux)"]);
+
+  /* CO2 KPI */
+  const co2Val = parseFloat(latest["CO2(ppm)"]);
+  setText("co2", isNaN(co2Val) ? '--' : Math.round(co2Val));
+  if(!isNaN(co2Val)){
+    const si = co2StatusInfo(co2Val);
+    const pill = document.getElementById('co2StatusPill');
+    const txt  = document.getElementById('co2StatusText');
+    pill.className = `co2-status ${si.cls}`;
+    pill.style.display = 'inline-flex';
+    pill.querySelector('i').className = `fa-solid ${si.icon}`;
+    txt.textContent = si.label;
+  }
 
   /* Timestamp */
   document.getElementById("liveDateTime").textContent=
@@ -953,6 +930,7 @@ async function fetchData(){
   const iH=win.map(d=>+d.r.InsideHumidity);
   const oH=win.map(d=>+d.r.OutsideHumidity);
   const lx=win.map(d=>+d.r["Radiation (Lux)"]);
+  const co=win.map(d=>+d.r["CO2(ppm)"]);
   const tl=thinLabels(labels);
 
   /* Analytics */
@@ -962,14 +940,19 @@ async function fetchData(){
   setText("stdHum",  std(iH).toFixed(2));
   setText("avgLux",  avg(lx).toFixed(2));
   setText("stdLux",  std(lx).toFixed(2));
+  const validCo = co.filter(v=>!isNaN(v)&&v>0);
+  if(validCo.length){
+    setText("avgCo2", avg(validCo).toFixed(2));
+    setText("stdCo2", std(validCo).toFixed(2));
+  }
 
-  /* Charts */
+  /* Destroy old charts */
   if(tempChart) tempChart.destroy();
   if(humChart)  humChart.destroy();
   if(luxChart)  luxChart.destroy();
+  if(co2Chart)  co2Chart.destroy();
 
   const opt=baseOpts();
-  const optLine={...opt};
 
   /* Temperature */
   tempChart=new Chart(document.getElementById('tempChart'),{
@@ -985,7 +968,7 @@ async function fetchData(){
           fill:true,tension:.45,pointRadius:0,borderWidth:2.5}
       ]
     },
-    options:optLine
+    options:{...opt}
   });
 
   /* Humidity */
@@ -1002,7 +985,7 @@ async function fetchData(){
           fill:true,tension:.45,pointRadius:0,borderWidth:2.5}
       ]
     },
-    options:opt
+    options:{...opt}
   });
 
   /* Radiation */
@@ -1014,11 +997,66 @@ async function fetchData(){
         {label:'Radiation (lux)',data:lx,
           backgroundColor:'rgba(255,183,0,0.55)',
           borderColor:'rgba(255,183,0,0.9)',
-          borderWidth:1,borderRadius:5,
-          borderSkipped:false}
+          borderWidth:1,borderRadius:5,borderSkipped:false}
       ]
     },
     options:{...opt,scales:{...opt.scales,x:{...opt.scales.x,stacked:false}}}
+  });
+
+  /* ★ CO2 Chart with 1000 ppm threshold annotation */
+  const co2MaxY = Math.max(...validCo, 1200) * 1.1;
+  const co2Opts = {
+    ...baseOpts(),
+    plugins:{
+      ...baseOpts().plugins,
+      annotation:{} // not loaded, handled manually via dataset
+    }
+  };
+  co2Chart=new Chart(document.getElementById('co2Chart'),{
+    type:'line',
+    data:{
+      labels:tl,
+      datasets:[
+        /* threshold line rendered as a dataset */
+        {
+          label:'Alert Threshold (1000 ppm)',
+          data:Array(tl.length).fill(1000),
+          borderColor:'rgba(255,77,106,0.55)',
+          borderWidth:1.5,
+          borderDash:[6,4],
+          pointRadius:0,
+          fill:false,
+          tension:0,
+          order:0
+        },
+        {
+          label:'CO₂ (ppm)',data:co,
+          borderColor:'#2dd4bf',
+          backgroundColor:'rgba(45,212,191,0.08)',
+          fill:true,tension:.4,pointRadius:0,borderWidth:2.5,
+          order:1
+        }
+      ]
+    },
+    options:{
+      ...co2Opts,
+      scales:{
+        x:{
+          ticks:{color:'#3a5570',font:{size:11}},
+          grid:{color:'rgba(255,255,255,0.04)'},
+          border:{color:'transparent'}
+        },
+        y:{
+          min:0,
+          ticks:{
+            color:'#3a5570',font:{size:11},
+            callback: v => v >= 1000 ? v+'✗' : v
+          },
+          grid:{color:'rgba(255,255,255,0.04)'},
+          border:{color:'transparent'}
+        }
+      }
+    }
   });
 }
 
@@ -1027,9 +1065,7 @@ function setText(id,val){
   if(el) el.textContent=val??'--';
 }
 
-/* ════════════════════════════════
-   INIT
-════════════════════════════════ */
+/* ════ INIT ════ */
 fetchData();
 setInterval(fetchData,60000);
 </script>
